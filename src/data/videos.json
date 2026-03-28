@@ -231,7 +231,7 @@
   "suggestedVideos": [
     {
       "id": "sug-camping-1",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+      "youtubeId": "gQvT-1iSj4I",
       "title": "Solo Survival Camping in Heavy Rain | ASMR",
       "author": "Wilderness Explorer",
       "avatar": "https://ui-avatars.com/api/?name=Camp&background=228B22&color=FFFFFF",
@@ -249,7 +249,7 @@
     },
     {
       "id": "sug-sports-1",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+      "youtubeId": "PZbG9i1o9IQ",
       "title": "Extreme Sports Compilation 2026 | Adrenaline Rush",
       "author": "X-Treme Life",
       "avatar": "https://ui-avatars.com/api/?name=XTreme&background=FF4500&color=FFFFFF",
@@ -267,7 +267,7 @@
     },
     {
       "id": "sug-yoga-1",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+      "youtubeId": "v7AYKMP6rOE",
       "title": "15 Minute Morning Yoga Flow | Full Body Stretch",
       "author": "Yoga with Emma",
       "avatar": "https://ui-avatars.com/api/?name=Yoga&background=FFB6C1&color=FFFFFF",
@@ -285,7 +285,7 @@
     },
     {
       "id": "sug-dance-3",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+      "youtubeId": "QxsqyI-B1mY",
       "title": "Hip Hop Choreography | Advanced Class Routine",
       "author": "Millennium Dance",
       "avatar": "https://ui-avatars.com/api/?name=Dance&background=8A2BE2&color=FFFFFF",

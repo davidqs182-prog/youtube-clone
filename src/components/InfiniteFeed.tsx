@@ -122,7 +122,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       {/* Right Column: Suggested Cards Stack */}
       <div className="hidden xl:flex w-[420px] flex-col gap-4 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar pb-10">
         <div className="flex flex-col gap-4 pr-2">
-          {suggestedVideos.map((video, idx) => (
+          {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => (
              <SuggestedVideoCard key={`sug-${video.id}-${idx}`} video={video} />
           ))}
         </div>
