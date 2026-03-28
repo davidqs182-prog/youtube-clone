@@ -1,11 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
 
 // Suggested Video Card with auto-playing video previews
 export default function SuggestedVideoCard({ video }: { video: any }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [inView, setInView] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Only trigger inView if the card is mostly visible
+        setInView(entry.isIntersecting);
+      },
+      { threshold: 0.6 } 
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const ytOptions = {
     width: "100%",
@@ -24,8 +44,11 @@ export default function SuggestedVideoCard({ video }: { video: any }) {
     }
   };
 
+  const shouldPlay = isHovered || inView;
+
   return (
     <div 
+      ref={cardRef}
       className="relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer group shadow-md hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all border border-white/10 shrink-0 bg-black"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -34,11 +57,11 @@ export default function SuggestedVideoCard({ video }: { video: any }) {
       <img 
         src={video.thumbnail} 
         alt={video.title} 
-        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 z-0 ${isHovered ? 'scale-105 opacity-0 delay-[600ms]' : 'scale-100 opacity-100'}`} 
+        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 z-0 ${shouldPlay ? 'scale-105 opacity-0 delay-[600ms]' : 'scale-100 opacity-100'}`} 
       />
 
       {/* Inner Video Trailer Layer - Rendered conditionally */}
-      {isHovered && (
+      {shouldPlay && (
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {video.youtubeId ? (
             <div className="w-full h-full grid place-items-center bg-black">
