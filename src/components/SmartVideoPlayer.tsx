@@ -172,7 +172,9 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       showinfo: 0,
       modestbranding: 1,
       playsinline: 1,
-      origin: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"
+      origin: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
+      loop: 1,
+      playlist: video.youtubeId
     }
   };
 
