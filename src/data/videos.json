@@ -1,0 +1,229 @@
+[
+  {
+    "id": "vid-0",
+    "youtubeId": "FDXHEruN4wE",
+    "url": "https://www.youtube.com/watch?v=FDXHEruN4wE",
+    "title": "Puerto Rico vs. Dominican Republic Game Highlights | 2023 World Baseball Classic",
+    "author": "World Baseball Classic",
+    "avatar": "https://ui-avatars.com/api/?name=WBC&background=002D62&color=FFFFFF",
+    "views": "3.5M views",
+    "publishedAt": "1 year ago",
+    "likes": "120K",
+    "comments": "8.4K",
+    "description": "Puerto Rico and Dominican Republic face off in a thrilling World Baseball Classic match.",
+    "thumbnail": "https://i.ytimg.com/vi/FDXHEruN4wE/hqdefault.jpg",
+    "highlights": [
+      {
+        "start": 30,
+        "end": 35,
+        "caption": "First Pitch"
+      },
+      {
+        "start": 120,
+        "end": 125,
+        "caption": "The Home Run!"
+      },
+      {
+        "start": 240,
+        "end": 245,
+        "caption": "Celebration"
+      }
+    ]
+  },
+  {
+    "id": "vid-1",
+    "youtubeId": "779if6cYvdw",
+    "url": "https://www.youtube.com/watch?v=779if6cYvdw",
+    "title": "FC BARCELONA 1 vs 0 RAYO VALLECANO | LALIGA MD 29 🔵🔴",
+    "author": "FC Barcelona",
+    "avatar": "https://ui-avatars.com/api/?name=FC+Barcelona&background=181733&color=a40046",
+    "views": "1.2M views",
+    "publishedAt": "2 years ago",
+    "likes": "45K",
+    "comments": "1.2K",
+    "description": "Lewandowski once again shows his high level. Highlights of the match against Rayo Vallecano.",
+    "thumbnail": "https://i.ytimg.com/vi/779if6cYvdw/hqdefault.jpg",
+    "highlights": [
+      {
+        "start": 10,
+        "end": 15,
+        "caption": "The teams enter the pitch"
+      },
+      {
+        "start": 45,
+        "end": 50,
+        "caption": "Incredible save!"
+      },
+      {
+        "start": 90,
+        "end": 95,
+        "caption": "The winning goal"
+      }
+    ]
+  },
+  {
+    "id": "vid-dance-1",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "title": "Urban Hip Hop Dance Choreography - Beginner Class",
+    "author": "Street Dance Studio",
+    "avatar": "https://ui-avatars.com/api/?name=Dance+Studio&background=random",
+    "views": "850K views",
+    "publishedAt": "3 months ago",
+    "likes": "65K",
+    "comments": "420",
+    "description": "Learn the basics of urban hip hop in this quick 10 minute summary of our masterclass.",
+    "thumbnail": "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=1280&q=80",
+    "highlights": [
+      {
+        "start": 35,
+        "end": 40,
+        "caption": "Warm up stretch"
+      },
+      {
+        "start": 120,
+        "end": 125,
+        "caption": "The main drop"
+      },
+      {
+        "start": 180,
+        "end": 185,
+        "caption": "Freestyle circle"
+      }
+    ]
+  },
+  {
+    "id": "vid-gaming-1",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "title": "Elden Ring: Shadow of the Erdtree - No Hit Boss Fight",
+    "author": "Gamer Zone",
+    "avatar": "https://ui-avatars.com/api/?name=Gamer+Zone&background=random",
+    "views": "2.1M views",
+    "publishedAt": "1 week ago",
+    "likes": "120K",
+    "comments": "4.5K",
+    "description": "Beating the final boss without taking a single hit. Pure skill.",
+    "thumbnail": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1280&q=80",
+    "highlights": [
+      {
+        "start": 15,
+        "end": 20,
+        "caption": "Entering the arena"
+      },
+      {
+        "start": 210,
+        "end": 215,
+        "caption": "Perfect dodge"
+      },
+      {
+        "start": 400,
+        "end": 405,
+        "caption": "The final blow"
+      }
+    ]
+  },
+  {
+    "id": "vid-sports-2",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+    "title": "NBA Ultimate Highlights 2026 - Best Dunks",
+    "author": "Hoops Nation",
+    "avatar": "https://ui-avatars.com/api/?name=Hoops+Nation&background=random",
+    "views": "14M views",
+    "publishedAt": "2 weeks ago",
+    "likes": "890K",
+    "comments": "12K",
+    "description": "The most electrifying dunks from the current NBA season.",
+    "thumbnail": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1280&q=80",
+    "highlights": [
+      {
+        "start": 45,
+        "end": 50,
+        "caption": "Posterizing dunk"
+      },
+      {
+        "start": 320,
+        "end": 325,
+        "caption": "Alley-oop full court"
+      },
+      {
+        "start": 600,
+        "end": 605,
+        "caption": "Game winning buzzer beater"
+      }
+    ]
+  },
+  {
+    "id": "vid-dance-2",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "title": "Salsa Masterclass - Learn to spin like a pro",
+    "author": "Latin Beats",
+    "avatar": "https://ui-avatars.com/api/?name=Latin+Beats&background=random",
+    "views": "500K views",
+    "publishedAt": "5 months ago",
+    "likes": "45K",
+    "comments": "210",
+    "description": "Step by step spins and drops for intermediate salsa dancers.",
+    "thumbnail": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1280&q=80",
+    "highlights": [
+      {
+        "start": 2,
+        "end": 5,
+        "caption": "Basic footwork"
+      },
+      {
+        "start": 8,
+        "end": 12,
+        "caption": "The double spin"
+      }
+    ]
+  },
+  {
+    "id": "vid-gaming-2",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "title": "VALORANT Champions Tour - Grand Final Highlights",
+    "author": "VCT Official",
+    "avatar": "https://ui-avatars.com/api/?name=VCT&background=random",
+    "views": "3.2M views",
+    "publishedAt": "11 months ago",
+    "likes": "300K",
+    "comments": "1.2K",
+    "description": "The clutch plays that decided the world championship.",
+    "thumbnail": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1280&q=80",
+    "highlights": [
+      {
+        "start": 2,
+        "end": 6,
+        "caption": "1 vs 3 Clutch"
+      },
+      {
+        "start": 10,
+        "end": 14,
+        "caption": "Lifting the trophy"
+      }
+    ]
+  },
+  {
+    "id": "vid-sports-4",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+    "title": "Extreme Downhill Mountain Biking",
+    "author": "Red Bull Bike",
+    "avatar": "https://ui-avatars.com/api/?name=Red+Bull&background=random",
+    "views": "400K views",
+    "publishedAt": "1 year ago",
+    "likes": "20K",
+    "comments": "120",
+    "description": "POV footage dropping down the steepest alpine trails.",
+    "thumbnail": "https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=1280&q=80",
+    "highlights": [
+      {
+        "start": 24,
+        "end": 28,
+        "caption": "The massive drop"
+      },
+      {
+        "start": 50,
+        "end": 55,
+        "caption": "Crossing the finish line"
+      }
+    ]
+  }
+]

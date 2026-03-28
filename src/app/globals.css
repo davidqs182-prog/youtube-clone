@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f0f0f;
+  --yt-bg: #ffffff;
+  --yt-text: #0f0f0f;
+  --yt-text-secondary: #606060;
+  --yt-hover: #f2f2f2;
+  --yt-border: #e5e5e5;
+  --yt-brand: #ff0000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f0f0f;
+    --foreground: #f1f1f1;
+    --yt-bg: #0f0f0f;
+    --yt-text: #f1f1f1;
+    --yt-text-secondary: #aaaaaa;
+    --yt-hover: #272727;
+    --yt-border: #3f3f3f;
+    --yt-brand: #ff0000;
+  }
+}
+
+body {
+  background: var(--yt-bg);
+  color: var(--yt-text);
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for a cleaner look in the sidebar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
