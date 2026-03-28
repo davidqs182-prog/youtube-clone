@@ -226,6 +226,58 @@
           "caption": "Crossing the finish line"
         }
       ]
+    },
+    {
+      "id": "feed-camping-2",
+      "youtubeId": "unkKlhgP4y4",
+      "url": "",
+      "title": "Winter Camping in a Blizzard | Deep Snow Survival",
+      "author": "Wilderness Explorer",
+      "avatar": "https://ui-avatars.com/api/?name=Camp&background=228B22&color=FFFFFF",
+      "views": "1.8M views",
+      "publishedAt": "2 months ago",
+      "description": "Surviving a massive winter storm in a hot tent.",
+      "thumbnail": "https://images.unsplash.com/photo-1549880181-56a44cf4a9a5?auto=format&fit=crop&w=1280&q=80",
+      "highlights": []
+    },
+    {
+      "id": "feed-sports-2",
+      "youtubeId": "ES2EMAUlspM",
+      "url": "",
+      "title": "Insane Parkour Runs & Flips 2026",
+      "author": "X-Treme Life",
+      "avatar": "https://ui-avatars.com/api/?name=XTreme&background=FF4500&color=FFFFFF",
+      "views": "3.5M views",
+      "publishedAt": "3 weeks ago",
+      "description": "The best parkour athletes defying gravity.",
+      "thumbnail": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1280&q=80",
+      "highlights": []
+    },
+    {
+      "id": "feed-yoga-2",
+      "youtubeId": "sTANio_2E0Q",
+      "url": "",
+      "title": "Yoga for Flexibility | 20 Minute Practice",
+      "author": "Yoga with Emma",
+      "avatar": "https://ui-avatars.com/api/?name=Yoga&background=FFB6C1&color=FFFFFF",
+      "views": "1.1M views",
+      "publishedAt": "1 year ago",
+      "description": "Improve your flexibility safely with this calming routine.",
+      "thumbnail": "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?auto=format&fit=crop&w=1280&q=80",
+      "highlights": []
+    },
+    {
+      "id": "feed-dance-4",
+      "youtubeId": "43DWlD0jtAo",
+      "url": "",
+      "title": "Beginner Hip Hop Dance Routine",
+      "author": "Millennium Dance",
+      "avatar": "https://ui-avatars.com/api/?name=Dance&background=8A2BE2&color=FFFFFF",
+      "views": "900K views",
+      "publishedAt": "5 months ago",
+      "description": "A slow breakdown of an amazing hip hop routine.",
+      "thumbnail": "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=1280&q=80",
+      "highlights": []
     }
   ],
   "suggestedVideos": [
