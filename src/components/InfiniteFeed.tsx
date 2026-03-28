@@ -25,7 +25,7 @@ interface VideoData {
   highlights: Highlight[];
 }
 
-export default function InfiniteFeed({ videos }: { videos: VideoData[] }) {
+export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVideos: VideoData[], suggestedVideos: VideoData[] }) {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [globalMuted, setGlobalMuted] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,7 +39,7 @@ export default function InfiniteFeed({ videos }: { videos: VideoData[] }) {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
             const id = entry.target.getAttribute("data-id");
             setActiveVideoId(id);
-            const idx = videos.findIndex(v => v.id === id);
+            const idx = feedVideos.findIndex(v => v.id === id);
             if (idx !== -1) currentIndex.current = idx;
           }
         });
@@ -55,7 +55,7 @@ export default function InfiniteFeed({ videos }: { videos: VideoData[] }) {
     });
 
     return () => observer.disconnect();
-  }, [videos]);
+  }, [feedVideos]);
 
   // Keyboard navigation for jumping between videos
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function InfiniteFeed({ videos }: { videos: VideoData[] }) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
         const nextIndex = currentIndex.current + 1;
-        if (nextIndex < videos.length) {
+        if (nextIndex < feedVideos.length) {
           videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       } else if (e.key === "ArrowUp") {
@@ -79,10 +79,10 @@ export default function InfiniteFeed({ videos }: { videos: VideoData[] }) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [videos]);
+  }, [feedVideos]);
 
   const handleTrailerEnd = (index: number) => {
-    if (index < videos.length - 1) {
+    if (index < feedVideos.length - 1) {
       const nextRef = videoRefs.current[index + 1];
       if (nextRef) {
         nextRef.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -95,7 +95,7 @@ export default function InfiniteFeed({ videos }: { videos: VideoData[] }) {
       
       {/* Left Column: Infinite Snapping Feed */}
       <div className="flex-1 w-full flex flex-col gap-10 md:gap-16">
-        {videos.map((video, idx) => (
+        {feedVideos.map((video, idx) => (
           <div 
             key={video.id} 
             data-id={video.id}
@@ -122,7 +122,7 @@ export default function InfiniteFeed({ videos }: { videos: VideoData[] }) {
       {/* Right Column: Suggested Cards Stack */}
       <div className="hidden xl:flex w-[420px] flex-col gap-4 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar pb-10">
         <div className="flex flex-col gap-4 pr-2">
-          {[...videos, ...videos, ...videos].map((video, idx) => (
+          {suggestedVideos.map((video, idx) => (
              <SuggestedVideoCard key={`sug-${video.id}-${idx}`} video={video} />
           ))}
         </div>
