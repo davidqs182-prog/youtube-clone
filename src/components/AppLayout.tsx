@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <TopNav toggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <main className="flex-1 h-full overflow-y-auto w-full relative snap-y snap-mandatory scroll-smooth">
+        <main className="flex-1 h-full overflow-y-auto no-scrollbar w-full relative snap-y snap-mandatory scroll-smooth">
           {children}
         </main>
       </div>
