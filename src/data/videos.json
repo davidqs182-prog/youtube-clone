@@ -64,7 +64,8 @@
     },
     {
       "id": "vid-dance-1",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "youtubeId": "aVk9D4DlT84",
+      "url": "",
       "title": "Urban Hip Hop Dance Choreography - Beginner Class",
       "author": "Street Dance Studio",
       "avatar": "https://ui-avatars.com/api/?name=Dance+Studio&background=random",
@@ -73,7 +74,7 @@
       "likes": "65K",
       "comments": "420",
       "description": "Learn the basics of urban hip hop in this quick 10 minute summary of our masterclass.",
-      "thumbnail": "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=1280&q=80",
+      "thumbnail": "https://i.ytimg.com/vi/aVk9D4DlT84/hqdefault.jpg",
       "highlights": [
         {
           "start": 35,
@@ -94,7 +95,8 @@
     },
     {
       "id": "vid-gaming-1",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      "youtubeId": "p60HEWUPJ10",
+      "url": "",
       "title": "Elden Ring: Shadow of the Erdtree - No Hit Boss Fight",
       "author": "Gamer Zone",
       "avatar": "https://ui-avatars.com/api/?name=Gamer+Zone&background=random",
@@ -103,7 +105,7 @@
       "likes": "120K",
       "comments": "4.5K",
       "description": "Beating the final boss without taking a single hit. Pure skill.",
-      "thumbnail": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1280&q=80",
+      "thumbnail": "https://i.ytimg.com/vi/p60HEWUPJ10/hqdefault.jpg",
       "highlights": [
         {
           "start": 15,
@@ -124,7 +126,8 @@
     },
     {
       "id": "vid-sports-2",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+      "youtubeId": "CGRzfUccmNE",
+      "url": "",
       "title": "NBA Ultimate Highlights 2026 - Best Dunks",
       "author": "Hoops Nation",
       "avatar": "https://ui-avatars.com/api/?name=Hoops+Nation&background=random",
@@ -133,7 +136,7 @@
       "likes": "890K",
       "comments": "12K",
       "description": "The most electrifying dunks from the current NBA season.",
-      "thumbnail": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1280&q=80",
+      "thumbnail": "https://i.ytimg.com/vi/CGRzfUccmNE/hqdefault.jpg",
       "highlights": [
         {
           "start": 45,
@@ -154,7 +157,8 @@
     },
     {
       "id": "vid-dance-2",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "youtubeId": "suny-SfWufU",
+      "url": "",
       "title": "Salsa Masterclass - Learn to spin like a pro",
       "author": "Latin Beats",
       "avatar": "https://ui-avatars.com/api/?name=Latin+Beats&background=random",
@@ -163,7 +167,7 @@
       "likes": "45K",
       "comments": "210",
       "description": "Step by step spins and drops for intermediate salsa dancers.",
-      "thumbnail": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1280&q=80",
+      "thumbnail": "https://i.ytimg.com/vi/suny-SfWufU/hqdefault.jpg",
       "highlights": [
         {
           "start": 2,
@@ -179,7 +183,8 @@
     },
     {
       "id": "vid-gaming-2",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "youtubeId": "l9m4cW2yxy0",
+      "url": "",
       "title": "VALORANT Champions Tour - Grand Final Highlights",
       "author": "VCT Official",
       "avatar": "https://ui-avatars.com/api/?name=VCT&background=random",
@@ -188,7 +193,7 @@
       "likes": "300K",
       "comments": "1.2K",
       "description": "The clutch plays that decided the world championship.",
-      "thumbnail": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1280&q=80",
+      "thumbnail": "https://i.ytimg.com/vi/l9m4cW2yxy0/hqdefault.jpg",
       "highlights": [
         {
           "start": 2,
@@ -204,7 +209,8 @@
     },
     {
       "id": "vid-sports-4",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+      "youtubeId": "ma67yOdMQfs",
+      "url": "",
       "title": "Extreme Downhill Mountain Biking",
       "author": "Red Bull Bike",
       "avatar": "https://ui-avatars.com/api/?name=Red+Bull&background=random",
@@ -213,7 +219,7 @@
       "likes": "20K",
       "comments": "120",
       "description": "POV footage dropping down the steepest alpine trails.",
-      "thumbnail": "https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=1280&q=80",
+      "thumbnail": "https://i.ytimg.com/vi/ma67yOdMQfs/hqdefault.jpg",
       "highlights": [
         {
           "start": 24,

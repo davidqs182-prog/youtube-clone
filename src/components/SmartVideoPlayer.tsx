@@ -22,6 +22,7 @@ interface VideoData {
   likes?: string;
   comments?: string;
   description?: string;
+  thumbnail?: string;
   highlights: Highlight[];
 }
 
@@ -37,6 +38,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ytPlayer, setYtPlayer] = useState<YouTubePlayer>(null);
   const hasEndedRef = useRef(false);
+  const [videoError, setVideoError] = useState(false);
   
   const [isTrailerMode, setIsTrailerMode] = useState(true);
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
@@ -192,6 +194,13 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
              className="w-[100%] h-[100%] scale-[1.3] transition-opacity duration-300" 
            />
         </div>
+      ) : videoError || !video.url ? (
+        // Fallback: show thumbnail when video URL is missing or fails
+        <img
+          src={video.thumbnail}
+          alt={video.title}
+          className="w-full h-full object-cover"
+        />
       ) : (
         <video
           ref={videoRef}
@@ -200,6 +209,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
           muted={globalMuted}
           loop={!isTrailerMode}
           playsInline
+          onError={() => setVideoError(true)}
         />
       )}
 
