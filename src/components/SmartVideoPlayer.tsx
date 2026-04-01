@@ -182,7 +182,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
   return (
     <div 
-      className="relative w-full rounded-xl overflow-hidden bg-black group aspect-video"
+      className="relative w-full rounded-[10px] overflow-hidden group aspect-video bg-black"
       onClick={enterFullVideoMode}
     >
       {video.youtubeId ? (
@@ -213,8 +213,6 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
         />
       )}
 
-      {/* Floating Gradient for text legibility */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/50 via-transparent to-black/10 transition-opacity" />
 
       {/* Header Overlay (Mute + Captions if in trailer mode) */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start pointer-events-none">

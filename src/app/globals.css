@@ -39,3 +39,35 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* ─── Google Gemini AI Brand Gradient Border ─────────────────────────────── */
+/* Colors extracted from the official Gemini logo:                            */
+/*   #4285F4 Google Blue → #9B72CB Purple → #1BA1E3 Teal → #D96570 Magenta  */
+@keyframes gemini-rotate {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+.gemini-border {
+  background: linear-gradient(
+    135deg,
+    #4285F4,
+    #9B72CB,
+    #1BA1E3,
+    #D96570,
+    #9B72CB,
+    #4285F4
+  );
+  background-size: 300% 300%;
+  animation: gemini-rotate 6s ease infinite;
+}
+
+.gemini-glow {
+  box-shadow:
+    0 0 20px rgba(66, 133, 244, 0.35),
+    0 0 40px rgba(155, 114, 203, 0.25),
+    0 0 60px rgba(217, 101, 112, 0.15);
+  animation: gemini-rotate 6s ease infinite;
+}

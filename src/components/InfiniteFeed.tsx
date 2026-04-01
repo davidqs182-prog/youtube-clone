@@ -105,8 +105,8 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
               transform: activeVideoId === video.id ? "scale(1)" : "scale(0.96)"
             }}
           >
-            {/* Ambient Lighting Edge / Container Effect */}
-            <div className={`w-full relative rounded-xl p-[4px] bg-gradient-to-br from-indigo-500/30 via-purple-500/20 to-teal-500/30 shadow-[0_0_50px_rgba(100,100,255,0.1)] transition-opacity duration-500 ${activeVideoId === video.id ? 'opacity-100' : 'opacity-40'}`}>
+            {/* Google AI / Gemini brand gradient border */}
+            <div className={`w-full relative rounded-xl p-[3px] transition-opacity duration-500 gemini-border ${activeVideoId === video.id ? 'opacity-100 gemini-glow' : 'opacity-40'}`}>
               <SmartVideoPlayer 
                 video={video} 
                 isActive={activeVideoId === video.id}
