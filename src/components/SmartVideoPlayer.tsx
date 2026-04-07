@@ -421,39 +421,56 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
         </div>
 
         {/* Control Buttons */}
-        <div className="flex items-center justify-between h-[44px]">
+        <div className="flex items-center justify-between h-[40px]">
            {/* Left Controls */}
            <div className="flex items-center gap-2">
-             <button onClick={togglePlay} className="w-11 h-11 bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+             <button onClick={togglePlay} className="w-[40px] h-[40px] p-[8px] bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
                {isPlaying && !isTrailerMode ? 
                  <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
                  <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
                }
              </button>
-             <button onClick={toggleMute} className="w-11 h-11 bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+             <button onClick={toggleMute} className="w-[40px] h-[40px] p-[8px] bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
                {globalMuted ? 
                  <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
                  <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
                }
              </button>
-             <div className="h-11 px-4 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
+             <div className="h-[40px] px-4 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
                 <span ref={timeTextRef} style={{fontFamily: "Roboto, Arial, sans-serif", fontSize: "14px"}}>0:00 / 0:00</span>
              </div>
            </div>
 
            {/* Right Controls Pill */}
-           <div className="flex items-center h-11 bg-black/50 backdrop-blur-md rounded-full px-2 gap-1 text-white mr-2">
-             <div className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors hidden sm:block">
-                <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M12,22 L12,14 L19,18 L12,22 Z M23.5,12 C25.98,12 28,14.02 28,16.5 C28,18.98 25.98,21 23.5,21 L12.5,21 C10.02,21 8,18.98 8,16.5 C8,14.02 10.02,12 12.5,12 L23.5,12 Z M23.5,13 L12.5,13 C10.57,13 9,14.57 9,16.5 C9,18.43 10.57,20 12.5,20 L23.5,20 C25.43,20 27,18.43 27,16.5 C27,14.57 25.43,13 23.5,13 Z"></path><circle cx="23.5" cy="16.5" r="3.5"></circle></svg>
+           <div className="flex items-center h-[40px] bg-black/50 backdrop-blur-md rounded-full px-1 gap-1 text-white mr-2">
+             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px] p-[8px]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="6" width="18" height="12" rx="2" />
+                  <path d="M10 10.5h-2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h2" />
+                  <path d="M17 10.5h-2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h2" />
+                </svg>
              </div>
-             <div className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors">
-                <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M11,18 L15,18 L15,20 L11,20 L11,18 Z M11,14 L15,14 L15,16 L11,16 L11,14 Z M17,18 L25,18 L25,20 L17,20 L17,18 Z M17,14 L25,14 L25,16 L17,16 L17,14 Z M28,10 L8,10 C6.9,10 6,10.9 6,12 L6,24 C6,25.1 6.9,26 8,26 L28,26 C29.1,26 30,25.1 30,24 L30,12 C30,10.9 29.1,10 28,10 Z M28,24 L8,24 L8,12 L28,12 L28,24 Z"></path></svg>
+             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px] p-[8px]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
              </div>
-             <div className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors">
-                <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="m 23.94,18.78 c .03,-0.25 .05,-0.51 .05,-0.78 0,-0.27 -0.02,-0.52 -0.05,-0.78 l 1.68,-1.32 c .15,-0.12 .19,-0.33 .09,-0.51 l -1.6,-2.76 c -0.09,-0.17 -0.31,-0.24 -0.48,-0.17 l -1.99,.8 c -0.41,-0.32 -0.86,-0.58 -1.35,-0.78 l -0.3,-2.12 c -0.02,-0.19 -0.19,-0.33 -0.39,-0.33 l -3.2,0 c -0.2,0 -0.36,.14 -0.39,.33 l -0.3,2.12 c -0.48,.2 -0.93,.47 -1.35,-0.78 l -1.99,-0.8 c -0.18,-0.07 -0.39,0 -0.48,.17 l -1.6,2.76 c -0.1,.17 -0.05,.39 .09,.51 l 1.68,1.32 c -0.03,.25 -0.05,.52 -0.05,.78 0,.26 .02,.52 .05,.78 l -1.68,1.32 c -0.15,.12 -0.19,.33 -0.09,.51 l 1.6,2.76 c .09,.17 .31,.24 .48,.17 l 1.99,-0.8 c .41,.32 .86,.58 1.35,.78 l .3,2.12 c .02,.19 .19,.33 .39,.33 l 3.2,0 c .2,0 .36,-0.14 .39,-0.33 l .3,-2.12 c .48,-0.2 .93,-0.47 1.35,-0.78 l 1.99,.8 c .18,.07 .39,0 .48,-0.17 l 1.6,-2.76 c .09,-0.17 .05,-0.39 -0.09,-0.51 l -1.68,-1.32 z M 18,21.5 c -1.93,0 -3.5,-1.57 -3.5,-3.5 0,-1.93 1.57,-3.5 3.5,-3.5 1.93,0 3.5,1.57 3.5,3.5 0,1.93 -1.57,3.5 -3.5,3.5 z"></path></svg>
+             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px] p-[8px]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M 9 10 L 7 12 L 9 14"/>
+                  <path d="M 15 10 L 17 12 L 15 14"/>
+                  <path d="M 3 16 L 21 16"/>
+                  <rect x="3" y="6" width="18" height="12" rx="2"/>
+                </svg>
              </div>
-             <div onClick={toggleFullscreen} className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors">
-               <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="m 10,16 2,0 0,-4 4,0 0,-2 L 10,10 l 0,6 0,0 z"></path><path d="m 20,10 0,2 4,0 0,4 2,0 L 26,10 l -6,0 0,0 z"></path><path d="m 24,24 -4,0 0,2 6,0 L 26,20 l -2,0 0,4 0,0 z"></path><path d="M 12,20 10,20 10,26 l 6,0 0,-2 -4,0 0,-4 0,0 z"></path></svg>
+             <div onClick={toggleFullscreen} className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px] p-[8px]">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                 <polyline points="9 5 5 5 5 9" />
+                 <line x1="5" y1="5" x2="11" y2="11" />
+                 <polyline points="15 19 19 19 19 15" />
+                 <line x1="19" y1="19" x2="13" y2="13" />
+               </svg>
              </div>
            </div>
         </div>
