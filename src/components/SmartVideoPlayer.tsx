@@ -421,42 +421,42 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
         </div>
 
         {/* Control Buttons */}
-        <div className="flex items-center justify-between h-[40px]">
+        <div className="flex items-center justify-between">
            {/* Left Controls */}
            <div className="flex items-center gap-2">
-             <button onClick={togglePlay} className="w-[40px] h-[40px] bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+             <button onClick={togglePlay} className="p-[8px] bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
                {isPlaying && !isTrailerMode ? 
                  <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
                  <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
                }
              </button>
-             <button onClick={toggleMute} className="w-[40px] h-[40px] bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+             <button onClick={toggleMute} className="p-[8px] bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
                {globalMuted ? 
                  <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
                  <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
                }
              </button>
-             <div className="h-[40px] px-4 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
+             <div className="px-4 py-[16px] bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
                 <span ref={timeTextRef} style={{fontFamily: "Roboto, Arial, sans-serif", fontSize: "14px"}}>0:00 / 0:00</span>
              </div>
            </div>
 
            {/* Right Controls Pill */}
-           <div className="flex items-center h-[40px] bg-black/50 backdrop-blur-md rounded-full px-1 gap-1 text-white mr-2">
-             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px]">
+           <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[8px] gap-[8px] text-white mr-2">
+             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="6" width="18" height="12" rx="2" />
                   <path d="M10 10.5h-2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h2" />
                   <path d="M17 10.5h-2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h2" />
                 </svg>
              </div>
-             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px]">
+             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                 </svg>
              </div>
-             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px]">
+             <div className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M 9 10 L 7 12 L 9 14"/>
                   <path d="M 15 10 L 17 12 L 15 14"/>
@@ -464,7 +464,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
                   <rect x="3" y="6" width="18" height="12" rx="2"/>
                 </svg>
              </div>
-             <div onClick={toggleFullscreen} className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center w-[40px] h-[40px]">
+             <div onClick={toggleFullscreen} className="cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                  <polyline points="9 5 5 5 5 9" />
                  <line x1="5" y1="5" x2="11" y2="11" />
