@@ -446,7 +446,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
            </div>
 
            {/* Right Controls Pill */}
-           <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[4px] gap-[8px] text-white mr-2">
+           <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[4px] gap-[16px] text-white mr-2">
              <div className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="6" width="18" height="12" rx="2" />
