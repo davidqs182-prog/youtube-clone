@@ -172,7 +172,19 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
   const togglePlay = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    exitTrailerMode();
+    
+    if (isTrailerMode) {
+      exitTrailerMode();
+      if (video.youtubeId && ytPlayer) {
+        ytPlayer.seekTo(0, true);
+        ytPlayer.playVideo();
+      } else if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play();
+      }
+      setIsPlaying(true);
+      return;
+    }
     
     if (isPlaying) {
       if (video.youtubeId && ytPlayer) {
@@ -212,11 +224,13 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     
     if (video.youtubeId && ytPlayer) {
       ytPlayer.seekTo(newTime, true);
+      ytPlayer.playVideo();
     } else if (videoRef.current) {
       videoRef.current.currentTime = newTime;
+      videoRef.current.play();
     }
     
-    if (!isPlaying) togglePlay(); 
+    setIsPlaying(true); 
   };
 
   // Keyboard controls
@@ -317,18 +331,11 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       )}
 
 
-      {/* Header Overlay (Mute + Captions if in trailer mode) */}
-      <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start pointer-events-none">
-        <div className="flex-1">
-          {isTrailerMode && isActive && currentCaption && (
-            <div className="text-white text-xl md:text-3xl font-bold tracking-tight drop-shadow-md bg-black/40 w-fit px-5 py-2 rounded-full backdrop-blur-md">
-              {currentCaption}
-            </div>
-          )}
-        </div>
+      {/* Header Overlay (Mute only) */}
+      <div className="absolute top-0 left-0 right-0 p-4 flex justify-end items-start pointer-events-none z-40">
         <button 
           onClick={toggleMute}
-          className="p-3 pointer-events-auto bg-black/40 hover:bg-black/60 rounded-full text-white backdrop-blur-md transition-all"
+          className="p-3 pointer-events-auto bg-black/40 hover:bg-black/60 rounded-full text-white backdrop-blur-md transition-all shadow-md"
         >
            {globalMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
         </button>
@@ -378,13 +385,10 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
            {/* Left Controls */}
            <div className="flex items-center gap-1">
              <button onClick={togglePlay} className="p-2 text-white hover:opacity-80 transition-opacity">
-               {isPlaying ? 
+               {isPlaying && !isTrailerMode ? 
                  <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
                  <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
                }
-             </button>
-             <button className="p-2 text-white hover:opacity-80 transition-opacity hidden md:block">
-               <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M 12,24 20.5,18 12,12 z M 22,12 v 12 h 2 z"></path></svg>
              </button>
              <button onClick={toggleMute} className="p-2 text-white hover:opacity-80 transition-opacity">
                {globalMuted ? 
