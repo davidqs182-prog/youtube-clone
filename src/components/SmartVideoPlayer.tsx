@@ -48,10 +48,12 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const [isFullscreen, setIsFullscreen] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrubberContainerRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const scrubberThumbRef = useRef<HTMLDivElement>(null);
   const timeTextRef = useRef<HTMLSpanElement>(null);
   const durationRef = useRef(0);
+  const isDraggingRef = useRef(false);
 
   const formatTime = (seconds: number) => {
     if (!seconds || isNaN(seconds)) return "0:00";
@@ -125,7 +127,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       durationRef.current = duration;
 
       // Update UI refs directly to avoid re-renders
-      if (duration > 0) {
+      if (duration > 0 && !isDraggingRef.current) {
          const percentage = (currentTime / duration) * 100;
          if (progressBarRef.current) progressBarRef.current.style.transform = `scaleX(${percentage / 100})`;
          if (scrubberThumbRef.current) scrubberThumbRef.current.style.left = `${percentage}%`;
@@ -214,24 +216,61 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     }
   };
 
-  const handleScrub = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    exitTrailerMode();
-
-    const rect = e.currentTarget.getBoundingClientRect();
+  const updateScrubberFromEvent = (e: React.PointerEvent | PointerEvent) => {
+    if (!scrubberContainerRef.current) return;
+    const rect = scrubberContainerRef.current.getBoundingClientRect();
     const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const newTime = percent * durationRef.current;
     
     if (video.youtubeId && ytPlayer) {
       ytPlayer.seekTo(newTime, true);
-      ytPlayer.playVideo();
     } else if (videoRef.current) {
       videoRef.current.currentTime = newTime;
-      videoRef.current.play();
     }
-    
-    setIsPlaying(true); 
+
+    if (progressBarRef.current) progressBarRef.current.style.transform = `scaleX(${percent})`;
+    if (scrubberThumbRef.current) scrubberThumbRef.current.style.left = `${percent * 100}%`;
   };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    exitTrailerMode();
+    isDraggingRef.current = true;
+    updateScrubberFromEvent(e);
+    
+    // Pause briefly while dragging
+    if (video.youtubeId && ytPlayer) ytPlayer.pauseVideo();
+    else if (videoRef.current) videoRef.current.pause();
+  };
+
+  // Setup global drag listeners
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isDraggingRef.current) return;
+      updateScrubberFromEvent(e);
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        
+        // Ensure play resumes after scrubbing
+        if (!isPlaying) {
+          togglePlay();
+        } else {
+          if (video.youtubeId && ytPlayer) ytPlayer.playVideo();
+          else if (videoRef.current) videoRef.current.play();
+        }
+      }
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [isPlaying, video, ytPlayer]);
 
   // Keyboard controls
   useEffect(() => {
@@ -356,62 +395,65 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
       {/* YouTube Custom Controls - Reveal on Hover */}
       <div 
-        className="absolute bottom-0 left-0 right-0 px-3 pb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 flex flex-col gap-1 cursor-default pointer-events-none group-hover:pointer-events-auto"
+        className="absolute bottom-0 left-0 right-0 px-4 pb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 flex flex-col gap-2 cursor-default pointer-events-none group-hover:pointer-events-auto"
         onClick={(e) => e.stopPropagation()} // Prevent playing video when clicking controls area
       >
         
         {/* Scrubber Area */}
         <div 
-           className="w-full h-[15px] flex items-center cursor-pointer group/scrubber relative"
-           onClick={handleScrub}
+           ref={scrubberContainerRef}
+           className="w-full h-[24px] flex items-center cursor-pointer group/scrubber relative"
+           onPointerDown={handlePointerDown}
         >
-            <div className="w-full h-[3px] group-hover/scrubber:h-[5px] bg-white/30 relative transition-all duration-100">
-               <div className="absolute left-0 top-0 bottom-0 bg-white/50 w-full" style={{transform: 'scaleX(0)', transformOrigin: '0 0'}} /> {/* Loaded Bar Fake */}
+            <div className="w-full relative flex items-center h-full">
+               <div className="absolute w-full h-[4px] bg-white/40 rounded-full" />
                <div 
                  ref={progressBarRef} 
-                 className="absolute left-0 top-0 bottom-0 bg-[var(--yt-brand)]" 
-                 style={{ transform: 'scaleX(0)', transformOrigin: '0 0' }}
+                 className="absolute h-[4px] bg-[#ff0000] rounded-l-full will-change-transform" 
+                 style={{ width: "100%", transform: 'scaleX(0)', transformOrigin: '0 0' }}
                />
                <div 
                  ref={scrubberThumbRef}
-                 className="absolute top-1/2 -translate-y-1/2 w-[13px] h-[13px] bg-[var(--yt-brand)] rounded-full opacity-0 group-hover/scrubber:opacity-100 transition-opacity duration-100"
-                 style={{ left: '0%' }}
+                 className="absolute w-[14px] h-[14px] bg-[#ff0000] rounded-full shadow-sm will-change-left"
+                 style={{ left: '0%', transform: "translateX(-50%)" }}
                />
             </div>
         </div>
 
         {/* Control Buttons */}
-        <div className="flex items-center justify-between h-[36px] px-1">
+        <div className="flex items-center justify-between h-[44px]">
            {/* Left Controls */}
-           <div className="flex items-center gap-1">
-             <button onClick={togglePlay} className="p-2 text-white hover:opacity-80 transition-opacity">
+           <div className="flex items-center gap-2">
+             <button onClick={togglePlay} className="w-11 h-11 bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
                {isPlaying && !isTrailerMode ? 
-                 <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
-                 <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
+                 <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
+                 <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
                }
              </button>
-             <button onClick={toggleMute} className="p-2 text-white hover:opacity-80 transition-opacity">
+             <button onClick={toggleMute} className="w-11 h-11 bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
                {globalMuted ? 
-                 <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
-                 <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
+                 <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
+                 <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
                }
              </button>
-             <span ref={timeTextRef} className="text-white text-[13px] ml-1 opacity-90 tracking-wide font-normal" style={{fontFamily: "Roboto, Arial, sans-serif"}}>0:00 / 0:00</span>
+             <div className="h-11 px-4 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
+                <span ref={timeTextRef} style={{fontFamily: "Roboto, Arial, sans-serif", fontSize: "14px"}}>0:00 / 0:00</span>
+             </div>
            </div>
 
-           {/* Right Controls */}
-           <div className="flex items-center gap-1 mr-2 text-white">
-             <div className="p-2 cursor-pointer hover:opacity-80 transition-opacity hidden sm:block">
-                <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M12,22 L12,14 L19,18 L12,22 Z M23.5,12 C25.98,12 28,14.02 28,16.5 C28,18.98 25.98,21 23.5,21 L12.5,21 C10.02,21 8,18.98 8,16.5 C8,14.02 10.02,12 12.5,12 L23.5,12 Z M23.5,13 L12.5,13 C10.57,13 9,14.57 9,16.5 C9,18.43 10.57,20 12.5,20 L23.5,20 C25.43,20 27,18.43 27,16.5 C27,14.57 25.43,13 23.5,13 Z"></path><circle cx="23.5" cy="16.5" r="3.5"></circle></svg>
+           {/* Right Controls Pill */}
+           <div className="flex items-center h-11 bg-black/50 backdrop-blur-md rounded-full px-2 gap-1 text-white mr-2">
+             <div className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors hidden sm:block">
+                <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M12,22 L12,14 L19,18 L12,22 Z M23.5,12 C25.98,12 28,14.02 28,16.5 C28,18.98 25.98,21 23.5,21 L12.5,21 C10.02,21 8,18.98 8,16.5 C8,14.02 10.02,12 12.5,12 L23.5,12 Z M23.5,13 L12.5,13 C10.57,13 9,14.57 9,16.5 C9,18.43 10.57,20 12.5,20 L23.5,20 C25.43,20 27,18.43 27,16.5 C27,14.57 25.43,13 23.5,13 Z"></path><circle cx="23.5" cy="16.5" r="3.5"></circle></svg>
              </div>
-             <div className="p-2 cursor-pointer hover:opacity-80 transition-opacity">
-                <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="M11,18 L15,18 L15,20 L11,20 L11,18 Z M11,14 L15,14 L15,16 L11,16 L11,14 Z M17,18 L25,18 L25,20 L17,20 L17,18 Z M17,14 L25,14 L25,16 L17,16 L17,14 Z M28,10 L8,10 C6.9,10 6,10.9 6,12 L6,24 C6,25.1 6.9,26 8,26 L28,26 C29.1,26 30,25.1 30,24 L30,12 C30,10.9 29.1,10 28,10 Z M28,24 L8,24 L8,12 L28,12 L28,24 Z"></path></svg>
+             <div className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors">
+                <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="M11,18 L15,18 L15,20 L11,20 L11,18 Z M11,14 L15,14 L15,16 L11,16 L11,14 Z M17,18 L25,18 L25,20 L17,20 L17,18 Z M17,14 L25,14 L25,16 L17,16 L17,14 Z M28,10 L8,10 C6.9,10 6,10.9 6,12 L6,24 C6,25.1 6.9,26 8,26 L28,26 C29.1,26 30,25.1 30,24 L30,12 C30,10.9 29.1,10 28,10 Z M28,24 L8,24 L8,12 L28,12 L28,24 Z"></path></svg>
              </div>
-             <div className="p-2 cursor-pointer hover:opacity-80 transition-opacity">
-                <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="m 23.94,18.78 c .03,-0.25 .05,-0.51 .05,-0.78 0,-0.27 -0.02,-0.52 -0.05,-0.78 l 1.68,-1.32 c .15,-0.12 .19,-0.33 .09,-0.51 l -1.6,-2.76 c -0.09,-0.17 -0.31,-0.24 -0.48,-0.17 l -1.99,.8 c -0.41,-0.32 -0.86,-0.58 -1.35,-0.78 l -0.3,-2.12 c -0.02,-0.19 -0.19,-0.33 -0.39,-0.33 l -3.2,0 c -0.2,0 -0.36,.14 -0.39,.33 l -0.3,2.12 c -0.48,.2 -0.93,.47 -1.35,.78 l -1.99,-0.8 c -0.18,-0.07 -0.39,0 -0.48,.17 l -1.6,2.76 c -0.1,.17 -0.05,.39 .09,.51 l 1.68,1.32 c -0.03,.25 -0.05,.52 -0.05,.78 0,.26 .02,.52 .05,.78 l -1.68,1.32 c -0.15,.12 -0.19,.33 -0.09,.51 l 1.6,2.76 c .09,.17 .31,.24 .48,.17 l 1.99,-0.8 c .41,.32 .86,.58 1.35,.78 l .3,2.12 c .02,.19 .19,.33 .39,.33 l 3.2,0 c .2,0 .36,-0.14 .39,-0.33 l .3,-2.12 c .48,-0.2 .93,-0.47 1.35,-0.78 l 1.99,.8 c .18,.07 .39,0 .48,-0.17 l 1.6,-2.76 c .09,-0.17 .05,-0.39 -0.09,-0.51 l -1.68,-1.32 z M 18,21.5 c -1.93,0 -3.5,-1.57 -3.5,-3.5 0,-1.93 1.57,-3.5 3.5,-3.5 1.93,0 3.5,1.57 3.5,3.5 0,1.93 -1.57,3.5 -3.5,3.5 z"></path></svg>
+             <div className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors">
+                <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="m 23.94,18.78 c .03,-0.25 .05,-0.51 .05,-0.78 0,-0.27 -0.02,-0.52 -0.05,-0.78 l 1.68,-1.32 c .15,-0.12 .19,-0.33 .09,-0.51 l -1.6,-2.76 c -0.09,-0.17 -0.31,-0.24 -0.48,-0.17 l -1.99,.8 c -0.41,-0.32 -0.86,-0.58 -1.35,-0.78 l -0.3,-2.12 c -0.02,-0.19 -0.19,-0.33 -0.39,-0.33 l -3.2,0 c -0.2,0 -0.36,.14 -0.39,.33 l -0.3,2.12 c -0.48,.2 -0.93,.47 -1.35,-0.78 l -1.99,-0.8 c -0.18,-0.07 -0.39,0 -0.48,.17 l -1.6,2.76 c -0.1,.17 -0.05,.39 .09,.51 l 1.68,1.32 c -0.03,.25 -0.05,.52 -0.05,.78 0,.26 .02,.52 .05,.78 l -1.68,1.32 c -0.15,.12 -0.19,.33 -0.09,.51 l 1.6,2.76 c .09,.17 .31,.24 .48,.17 l 1.99,-0.8 c .41,.32 .86,.58 1.35,.78 l .3,2.12 c .02,.19 .19,.33 .39,.33 l 3.2,0 c .2,0 .36,-0.14 .39,-0.33 l .3,-2.12 c .48,-0.2 .93,-0.47 1.35,-0.78 l 1.99,.8 c .18,.07 .39,0 .48,-0.17 l 1.6,-2.76 c .09,-0.17 .05,-0.39 -0.09,-0.51 l -1.68,-1.32 z M 18,21.5 c -1.93,0 -3.5,-1.57 -3.5,-3.5 0,-1.93 1.57,-3.5 3.5,-3.5 1.93,0 3.5,1.57 3.5,3.5 0,1.93 -1.57,3.5 -3.5,3.5 z"></path></svg>
              </div>
-             <div onClick={toggleFullscreen} className="p-2 cursor-pointer hover:opacity-80 transition-opacity">
-               <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%" className="w-9 h-9 fill-current"><path d="m 10,16 2,0 0,-4 4,0 0,-2 L 10,10 l 0,6 0,0 z"></path><path d="m 20,10 0,2 4,0 0,4 2,0 L 26,10 l -6,0 0,0 z"></path><path d="m 24,24 -4,0 0,2 6,0 L 26,20 l -2,0 0,4 0,0 z"></path><path d="M 12,20 10,20 10,26 l 6,0 0,-2 -4,0 0,-4 0,0 z"></path></svg>
+             <div onClick={toggleFullscreen} className="p-1 cursor-pointer hover:bg-white/20 rounded-full transition-colors">
+               <svg height="24" version="1.1" viewBox="0 0 36 36" width="24" className="fill-current"><path d="m 10,16 2,0 0,-4 4,0 0,-2 L 10,10 l 0,6 0,0 z"></path><path d="m 20,10 0,2 4,0 0,4 2,0 L 26,10 l -6,0 0,0 z"></path><path d="m 24,24 -4,0 0,2 6,0 L 26,20 l -2,0 0,4 0,0 z"></path><path d="M 12,20 10,20 10,26 l 6,0 0,-2 -4,0 0,-4 0,0 z"></path></svg>
              </div>
            </div>
         </div>
