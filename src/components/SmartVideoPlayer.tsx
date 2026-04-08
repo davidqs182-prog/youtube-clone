@@ -495,7 +495,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
          {/* Like */}
          <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-            <div className="w-12 h-12 bg-white/20 group-hover:bg-white/30 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
+            <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
                <ThumbsUp size={24} fill="currentColor" className="opacity-100"/>
             </div>
             <span className="text-white text-[12px] font-semibold drop-shadow-md">{video.likes || "10K"}</span>
@@ -503,7 +503,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
          {/* Dislike */}
          <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-            <div className="w-12 h-12 bg-white/20 group-hover:bg-white/30 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
+            <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
                <ThumbsDown size={24} fill="currentColor" className="opacity-100 mt-0.5"/>
             </div>
             <span className="text-white text-[12px] font-semibold drop-shadow-md">Dislike</span>
@@ -511,7 +511,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
          {/* Comment */}
          <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-            <div className="w-12 h-12 bg-white/20 group-hover:bg-white/30 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
+            <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
                <MessageSquare size={24} fill="currentColor" className="opacity-100"/>
             </div>
             <span className="text-white text-[12px] font-semibold drop-shadow-md">{video.comments || "120"}</span>
@@ -519,7 +519,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
          {/* Share */}
          <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-            <div className="w-12 h-12 bg-white/20 group-hover:bg-white/30 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
+            <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
                <Share2 size={24} fill="currentColor" className="opacity-100"/>
             </div>
             <span className="text-white text-[12px] font-semibold drop-shadow-md">Share</span>
@@ -527,7 +527,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
          {/* More */}
          <div className="flex flex-col items-center cursor-pointer group mt-1">
-            <div className="w-12 h-12 bg-white/20 group-hover:bg-white/30 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
+            <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
                <MoreHorizontal size={24} />
             </div>
          </div>
