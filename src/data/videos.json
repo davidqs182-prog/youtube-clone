@@ -422,6 +422,86 @@
           "caption": "The main move"
         }
       ]
+    },
+    {
+      "id": "sug-collection-sports-1",
+      "type": "collection",
+      "category": "Extreme Sports Collection",
+      "youtubeId": "ES2EMAUlspM",
+      "title": "Extreme Sports Collection 1",
+      "author": "People Are Awesome",
+      "avatar": "https://ui-avatars.com/api/?name=PAA&background=FF4500&color=FFFFFF",
+      "views": "1M views",
+      "publishedAt": "1 week ago",
+      "description": "A collection of sports.",
+      "thumbnail": "https://i.ytimg.com/vi/ES2EMAUlspM/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 5,
+          "end": 10,
+          "caption": "Preview"
+        }
+      ]
+    },
+    {
+      "id": "sug-collection-sports-2",
+      "type": "collection",
+      "category": "Surfing Highlights",
+      "youtubeId": "ma67yOdMQfs",
+      "title": "Surfing Highlights",
+      "author": "World Surf League",
+      "avatar": "https://ui-avatars.com/api/?name=WSL&background=005f99&color=FFFFFF",
+      "views": "500K views",
+      "publishedAt": "2 weeks ago",
+      "description": "Collection of surfing.",
+      "thumbnail": "https://i.ytimg.com/vi/ma67yOdMQfs/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 24,
+          "end": 28,
+          "caption": "Barrel"
+        }
+      ]
+    },
+    {
+      "id": "sug-collection-mechanics-1",
+      "type": "collection",
+      "category": "Mechanic in the house",
+      "youtubeId": "X_tKzZiSTaE",
+      "title": "Basic Car Maintenance",
+      "author": "Auto Fix",
+      "avatar": "https://ui-avatars.com/api/?name=AF&background=333&color=FFF",
+      "views": "2.1M views",
+      "publishedAt": "1 year ago",
+      "description": "Learn basic mechanic tasks in this collection.",
+      "thumbnail": "https://i.ytimg.com/vi/X_tKzZiSTaE/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 10,
+          "end": 15,
+          "caption": "Tire change"
+        }
+      ]
+    },
+    {
+      "id": "sug-collection-mechanics-2",
+      "type": "collection",
+      "category": "Engine Rebuilds",
+      "youtubeId": "s_nN_sX-X-g",
+      "title": "Complete Engine Rebuild Collection",
+      "author": "Gearhead Garage",
+      "avatar": "https://ui-avatars.com/api/?name=GG&background=555&color=FFF",
+      "views": "850K views",
+      "publishedAt": "3 months ago",
+      "description": "Deep dive into engine mechanics.",
+      "thumbnail": "https://i.ytimg.com/vi/s_nN_sX-X-g/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 30,
+          "end": 35,
+          "caption": "Piston install"
+        }
+      ]
     }
   ]
 }

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import SmartVideoPlayer from "./SmartVideoPlayer";
 import SuggestedVideoCard from "./SuggestedVideoCard";
+import CollectionCard from "./CollectionCard";
 
 interface Highlight {
   start: number;
@@ -23,6 +24,8 @@ interface VideoData {
   description?: string;
   thumbnail: string;
   highlights: Highlight[];
+  type?: string;
+  category?: string;
 }
 
 export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVideos: VideoData[], suggestedVideos: VideoData[] }) {
@@ -122,9 +125,12 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       {/* Right Column: Suggested Cards Stack */}
       <div className="hidden xl:flex w-[420px] flex-col gap-4 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar pb-10">
         <div className="flex flex-col gap-4 pr-2">
-          {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => (
-             <SuggestedVideoCard key={`sug-${video.id}-${idx}`} video={video} />
-          ))}
+          {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => {
+             if (video.type === "collection") {
+               return <CollectionCard key={`sug-${video.id}-${idx}`} video={video} />;
+             }
+             return <SuggestedVideoCard key={`sug-${video.id}-${idx}`} video={video} />
+          })}
         </div>
       </div>
     </div>
