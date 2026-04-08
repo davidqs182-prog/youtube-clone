@@ -14,10 +14,11 @@ export default function TopNav({ toggleSidebar }: TopNavProps) {
           <Menu className="w-6 h-6 text-[var(--yt-text)]" />
         </button>
         <Link href="/" className="flex items-center gap-1" title="YouTube Home">
-          <div className="bg-red-600 text-white font-bold px-2 py-0.5 rounded flex items-center justify-center text-sm md:text-base tracking-tighter relative">
-            <span className="scale-110 mb-0.5">▶</span>
-          </div>
-          <span className="font-semibold text-lg md:text-xl tracking-tighter">YouTube</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="21" viewBox="0 0 30 21" className="ml-0.5">
+            <path fill="#FF0000" d="M29.5 3.3c-.3-1.2-1.3-2.1-2.5-2.5C24.8.2 15 .2 15 .2s-9.8 0-12 .6C1.8 1.2.8 2.1.5 3.3.2 5.5.2 10.5.2 10.5s0 5 .3 7.2c.3 1.2 1.3 2.1 2.5 2.5 2.2.6 12 .6 12 .6s9.8 0 12-.6c1.2-.4 2.2-1.3 2.5-2.5.3-2.2.3-7.2.3-7.2s0-5-.3-7.2z"/>
+            <path fill="#FFFFFF" d="M12 15l8-4.5-8-4.5v9z"/>
+          </svg>
+          <span className="font-semibold text-lg md:text-[21px] tracking-tighter text-white" style={{ letterSpacing: '-0.8px' }}>YouTube</span>
         </Link>
       </div>
 
