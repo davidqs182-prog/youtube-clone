@@ -34,6 +34,15 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
   const currentIndex = useRef<number>(0);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -94,22 +103,22 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   };
 
   return (
-    <div className="w-full flex flex-col xl:flex-row justify-center px-4 xl:px-6 py-6 gap-6 xl:gap-10 pb-32">
+    <div className={`w-full flex justify-center ${isFullscreen ? 'flex-col p-0 gap-0' : 'flex-col xl:flex-row px-4 xl:px-6 py-6 gap-6 xl:gap-10 pb-32'}`}>
       
       {/* Left Column: Infinite Snapping Feed */}
-      <div className="flex-1 w-full flex flex-col gap-10 md:gap-16">
+      <div className={`flex-1 w-full flex flex-col ${isFullscreen ? 'gap-0' : 'gap-10 md:gap-16'}`}>
         {feedVideos.map((video, idx) => (
           <div 
             key={video.id} 
             data-id={video.id}
             ref={(el) => { videoRefs.current[idx] = el; }}
-            className="w-full flex flex-col gap-4 snap-center transition-transform duration-500"
+            className={`w-full flex flex-col snap-center transition-transform duration-500 ${isFullscreen ? 'h-[100vh] justify-center' : 'gap-4'}`}
             style={{ 
-              transform: activeVideoId === video.id ? "scale(1)" : "scale(0.96)"
+              transform: activeVideoId === video.id || isFullscreen ? "scale(1)" : "scale(0.96)"
             }}
           >
             {/* Google AI / Gemini brand gradient border */}
-            <div className={`w-full relative rounded-xl p-[3px] transition-opacity duration-500 gemini-border ${activeVideoId === video.id ? 'opacity-100 gemini-glow' : 'opacity-40'}`}>
+            <div className={`w-full relative transition-all duration-500 ${isFullscreen ? '' : 'rounded-xl p-[3px] gemini-border'} ${activeVideoId === video.id ? 'opacity-100 gemini-glow' : 'opacity-40'}`}>
               <SmartVideoPlayer 
                 video={video} 
                 isActive={activeVideoId === video.id}
@@ -123,7 +132,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       </div>
 
       {/* Right Column: Suggested Cards Stack */}
-      <div className="hidden xl:flex w-[420px] flex-col gap-4 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar pb-10">
+      <div className={`${isFullscreen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar pb-10`}>
         <div className="flex flex-col gap-4 pr-2">
           {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => {
              if (video.type === "collection") {

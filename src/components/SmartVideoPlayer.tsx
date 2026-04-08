@@ -64,6 +64,14 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
   // Play/Pause Control
   useEffect(() => {
     if (isActive) {
@@ -205,10 +213,15 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     }
   };
 
-  const toggleFullscreen = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const toggleFullscreen = (e?: React.MouseEvent | KeyboardEvent) => {
+    e?.stopPropagation();
     if (!document.fullscreenElement) {
-      containerRef.current?.requestFullscreen().catch(err => console.error(err));
+      const mainEl = document.querySelector('main');
+      if (mainEl) {
+        mainEl.requestFullscreen().catch(err => console.error(err));
+      } else {
+        containerRef.current?.requestFullscreen().catch(err => console.error(err));
+      }
       setIsFullscreen(true);
     } else {
       document.exitFullscreen();
@@ -275,9 +288,16 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
+      
       if (e.code === "Space" && isActive) {
         e.preventDefault(); 
         togglePlay();
+      }
+      
+      if ((e.key === "f" || e.key === "F") && isActive) {
+        e.preventDefault();
+        toggleFullscreen(e);
       }
     };
     
