@@ -1,4 +1,5 @@
 import { X, ThumbsUp, ThumbsDown, Settings2, MoreVertical, Reply, Send } from "lucide-react";
+import { useMemo } from "react";
 
 interface CommentsPanelProps {
   onClose: () => void;
@@ -6,54 +7,63 @@ interface CommentsPanelProps {
 }
 
 export default function CommentsPanel({ onClose, video }: CommentsPanelProps) {
-  // Mock comments data mirroring Image 2
-  const mockComments = [
-    {
-      id: 1,
-      name: "@ninopreuss2549",
-      time: "6 years ago",
-      text: "That moment when you're watching this at 2 am",
-      likes: "42K",
-      replies: 857,
-      avatar: "https://ui-avatars.com/api/?name=nino&background=000&color=FFF"
-    },
-    {
-      id: 2,
-      name: "@ayeleru7489",
-      time: "1 year ago",
-      text: "'sleep center ' that'll be a cool way to start referring to my bedroom now",
-      likes: "646",
-      replies: 3,
-      avatar: "https://ui-avatars.com/api/?name=ayeleru&background=228B22&color=FFF"
-    },
-    {
-      id: 3,
-      name: "@doniyoraloxanov",
-      time: "3 years ago",
-      text: "deep sleep + deep work = deep success",
-      likes: "3.6K",
-      replies: 14,
-      avatar: "https://ui-avatars.com/api/?name=doniyor&background=B22222&color=FFF"
-    },
-    {
-      id: 4,
-      name: "@justfun-og3xg",
-      time: "9 months ago",
-      text: "As a English learner, im just lowkey disappointed that a huge channel such as TED got the Subtitles unmached with the speech of representor :(",
-      likes: "157",
-      replies: 4,
-      avatar: "https://ui-avatars.com/api/?name=justfun&background=4169E1&color=FFF"
-    },
-    {
-      id: 5,
-      name: "@codingexpert",
-      time: "2 days ago",
-      text: "This tutorial perfectly sums up why we need stronger foundations before scaling applications.",
-      likes: "23",
-      replies: 0,
-      avatar: "https://ui-avatars.com/api/?name=coding&background=4B0082&color=FFF"
+  const dynamicComments = useMemo(() => {
+    if (!video) return [];
+    
+    const pool = [
+      "This is exactly what I was looking for!",
+      "I can't believe how detailed this is. Incredible job.",
+      "I've been watching this channel for years, never disappoints.",
+      "The algorithm finally blessed me today.",
+      "Such an underrated masterpiece.",
+      "This perfectly sums up everything.",
+      "Anyone else watching this in 2024?",
+      "Thanks for sharing this, really helpful!",
+      "I literally watched this 5 times already.",
+      "Bro really thought he could get away with that 😂",
+      "Please make a part 2 to this!"
+    ];
+    
+    const names = ["ninopreuss", "ayeleru", "doniyoraloxanov", "justfun", "codingexpert", "maria_designs", "tech_freak", "gamerz_unite", "random_user"];
+    const times = ["1 year ago", "3 weeks ago", "9 months ago", "2 days ago", "14 hours ago", "just now", "1 month ago"];
+    
+    // Always include a specific tailored comment at the top!
+    const tailoredComment = {
+      id: `c-0-${video.id}`,
+      name: `@${video.author.replace(/\s+/g, '').toLowerCase()}`,
+      time: "Pinned by creator",
+      text: `Welcome! Feel free to ask any questions about "${video.title}" right here in the comments section! 👇`,
+      likes: "14K",
+      replies: 128,
+      avatar: video.avatar || `https://ui-avatars.com/api/?name=Creator&background=ff0000&color=FFF`
+    };
+
+    const generated = [tailoredComment];
+    
+    // Generate 6 to 12 random comments
+    let seed = video.id.charCodeAt(0) + video.id.length; // simple pseudo-seed
+    const random = () => {
+      const x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    };
+
+    const count = Math.floor(random() * 6) + 6; 
+    for(let i=1; i<count; i++) {
+       const nameStr = names[Math.floor(random() * names.length)];
+       const hexColor = Math.floor(random()*16777215).toString(16).padStart(6, '0');
+       generated.push({
+          id: `c-${video.id}-${i}`,
+          name: `@${nameStr}${Math.floor(random()*1000)}`,
+          time: times[Math.floor(random() * times.length)],
+          text: pool[Math.floor(random() * pool.length)],
+          likes: Math.floor(random() * 900) + (random() > 0.5 ? "K" : ""),
+          replies: Math.floor(random() * 50),
+          avatar: `https://ui-avatars.com/api/?name=${nameStr}&background=${hexColor}&color=FFF`
+       });
     }
-  ];
+    
+    return generated;
+  }, [video]);
 
   const emojis = ["❤️", "🙌", "🔥", "👏", "😢", "😍", "😮", "😂"];
 
@@ -63,7 +73,7 @@ export default function CommentsPanel({ onClose, video }: CommentsPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--yt-border)] shrink-0">
         <div className="flex items-center gap-4">
-          <span className="font-bold text-lg text-white">11,332 Comments</span>
+          <span className="font-bold text-lg text-white">{video?.comments || "11,332"} Comments</span>
           <button className="flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors cursor-pointer group">
             <Settings2 size={18} className="group-hover:scale-105" />
             <span className="text-sm font-semibold">Sort by</span>
@@ -80,7 +90,7 @@ export default function CommentsPanel({ onClose, video }: CommentsPanelProps) {
       {/* Scrollable Comments List */}
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar overscroll-contain px-4 py-4">
         <div className="flex flex-col gap-6">
-          {mockComments.map(comment => (
+          {dynamicComments.map(comment => (
             <div key={comment.id} className="flex gap-4">
               <img src={comment.avatar} alt="User avatar" className="w-10 h-10 rounded-full shrink-0 mt-0.5 object-cover" />
               <div className="flex flex-col flex-1">
