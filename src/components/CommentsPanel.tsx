@@ -78,7 +78,7 @@ export default function CommentsPanel({ onClose, video }: CommentsPanelProps) {
       </div>
 
       {/* Scrollable Comments List */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar overscroll-contain px-4 py-4">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar overscroll-contain px-4 py-4">
         <div className="flex flex-col gap-6">
           {mockComments.map(comment => (
             <div key={comment.id} className="flex gap-4">
