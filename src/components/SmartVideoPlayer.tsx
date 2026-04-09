@@ -32,9 +32,11 @@ interface SmartVideoPlayerProps {
   onTrailerEnd: () => void;
   globalMuted: boolean;
   setGlobalMuted: (val: boolean) => void;
+  isCommentsOpen?: boolean;
+  onOpenComments?: () => void;
 }
 
-export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, globalMuted, setGlobalMuted }: SmartVideoPlayerProps) {
+export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, globalMuted, setGlobalMuted, isCommentsOpen, onOpenComments }: SmartVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ytPlayer, setYtPlayer] = useState<YouTubePlayer>(null);
   const hasEndedRef = useRef(false);
@@ -43,6 +45,14 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const [isTrailerMode, setIsTrailerMode] = useState(true);
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
   const [currentCaption, setCurrentCaption] = useState("");
+  const [trailerLoopCount, setTrailerLoopCount] = useState(0);
+
+  useEffect(() => {
+    if (!isCommentsOpen && trailerLoopCount > 0) {
+      onTrailerEnd();
+      setTrailerLoopCount(0);
+    }
+  }, [isCommentsOpen, trailerLoopCount, onTrailerEnd]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -160,8 +170,19 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
             }
           } else {
             if (!hasEndedRef.current) {
-              hasEndedRef.current = true;
-              onTrailerEnd();
+              if (isCommentsOpen) {
+                const nextIndex = 0;
+                setCurrentHighlightIndex(nextIndex);
+                if (video.youtubeId && ytPlayer) {
+                   ytPlayer.seekTo(video.highlights[nextIndex].start, true);
+                } else if (videoRef.current) {
+                   videoRef.current.currentTime = video.highlights[nextIndex].start;
+                }
+                setTrailerLoopCount(prev => prev + 1);
+              } else {
+                hasEndedRef.current = true;
+                onTrailerEnd();
+              }
             }
           }
         }
@@ -172,7 +193,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
     animationFrameId = requestAnimationFrame(checkTime);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isActive, isTrailerMode, ytPlayer, currentHighlightIndex, video]);
+  }, [isActive, isTrailerMode, ytPlayer, currentHighlightIndex, video, isCommentsOpen, onTrailerEnd]);
 
   const exitTrailerMode = () => {
     if (!isTrailerMode) return;
@@ -530,7 +551,13 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
          </div>
 
          {/* Comment */}
-         <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
+         <div 
+            className="flex flex-col items-center gap-1.5 cursor-pointer group"
+            onClick={(e) => {
+               e.stopPropagation();
+               if (!isFullscreen && onOpenComments) onOpenComments();
+            }}
+         >
             <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
                <MessageSquare size={24} fill="currentColor" className="opacity-100"/>
             </div>

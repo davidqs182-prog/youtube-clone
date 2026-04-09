@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import SmartVideoPlayer from "./SmartVideoPlayer";
 import SuggestedVideoCard from "./SuggestedVideoCard";
 import CollectionCard from "./CollectionCard";
+import CommentsPanel from "./CommentsPanel";
 
 interface Highlight {
   start: number;
@@ -35,6 +36,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
   const currentIndex = useRef<number>(0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -125,22 +127,31 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
                 onTrailerEnd={() => handleTrailerEnd(idx)} 
                 globalMuted={globalMuted}
                 setGlobalMuted={setGlobalMuted}
+                isCommentsOpen={isCommentsOpen && activeVideoId === video.id}
+                onOpenComments={() => setIsCommentsOpen(true)}
               />
             </div>
           </div>
         ))}
       </div>
 
-      {/* Right Column: Suggested Cards Stack */}
-      <div className={`${isFullscreen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar pb-10`}>
-        <div className="flex flex-col gap-4 pr-2">
-          {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => {
-             if (video.type === "collection") {
-               return <CollectionCard key={`sug-${video.id}-${idx}`} video={video} />;
-             }
-             return <SuggestedVideoCard key={`sug-${video.id}-${idx}`} video={video} />
-          })}
-        </div>
+      {/* Right Column: Suggested Cards Stack or Comments Panel */}
+      <div className={`${isFullscreen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-hidden pb-4 relative`}>
+        {isCommentsOpen && !isFullscreen ? (
+          <CommentsPanel 
+            onClose={() => setIsCommentsOpen(false)} 
+            video={feedVideos.find(v => v.id === activeVideoId)} 
+          />
+        ) : (
+          <div className="flex flex-col gap-4 pr-2 overflow-y-auto no-scrollbar h-full pb-10">
+            {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => {
+               if (video.type === "collection") {
+                 return <CollectionCard key={`sug-${video.id}-${idx}`} video={video} />;
+               }
+               return <SuggestedVideoCard key={`sug-${video.id}-${idx}`} video={video} />
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
