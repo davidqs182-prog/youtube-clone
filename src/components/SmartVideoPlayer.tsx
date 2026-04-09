@@ -555,7 +555,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
             className="flex flex-col items-center gap-1.5 cursor-pointer group"
             onClick={(e) => {
                e.stopPropagation();
-               if (!isFullscreen && onOpenComments) onOpenComments();
+               if (onOpenComments) onOpenComments();
             }}
          >
             <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">

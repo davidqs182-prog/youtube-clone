@@ -105,22 +105,22 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   };
 
   return (
-    <div className={`w-full flex justify-center ${isFullscreen ? 'flex-col p-0 gap-0' : 'flex-col xl:flex-row px-4 xl:px-6 py-6 gap-6 xl:gap-10 pb-32'}`}>
+    <div className={`w-full flex justify-center ${isFullscreen && !isCommentsOpen ? 'flex-col p-0 gap-0' : 'flex-col xl:flex-row px-4 xl:px-6 py-6 gap-6 xl:gap-10 pb-32'}`}>
       
       {/* Left Column: Infinite Snapping Feed */}
-      <div className={`flex-1 w-full flex flex-col ${isFullscreen ? 'gap-0' : 'gap-10 md:gap-16'}`}>
+      <div className={`flex-1 w-full flex flex-col ${isFullscreen && !isCommentsOpen ? 'gap-0' : 'gap-10 md:gap-16'}`}>
         {feedVideos.map((video, idx) => (
           <div 
             key={video.id} 
             data-id={video.id}
             ref={(el) => { videoRefs.current[idx] = el; }}
-            className={`w-full flex flex-col snap-center transition-transform duration-500 ${isFullscreen ? 'h-[100vh] justify-center' : 'gap-4'}`}
+            className={`w-full flex flex-col snap-center transition-transform duration-500 ${isFullscreen && !isCommentsOpen ? 'h-[100vh] justify-center' : 'gap-4'}`}
             style={{ 
-              transform: activeVideoId === video.id || isFullscreen ? "scale(1)" : "scale(0.96)"
+              transform: activeVideoId === video.id || (isFullscreen && !isCommentsOpen) ? "scale(1)" : "scale(0.96)"
             }}
           >
             {/* Google AI / Gemini brand gradient border */}
-            <div className={`w-full relative transition-all duration-500 ${isFullscreen ? '' : 'rounded-xl p-[3px] gemini-border'} ${activeVideoId === video.id ? 'opacity-100 gemini-glow' : 'opacity-40'}`}>
+            <div className={`w-full relative transition-all duration-500 ${isFullscreen && !isCommentsOpen ? '' : 'rounded-xl p-[3px] gemini-border'} ${activeVideoId === video.id ? 'opacity-100 gemini-glow' : 'opacity-40'}`}>
               <SmartVideoPlayer 
                 video={video} 
                 isActive={activeVideoId === video.id}
@@ -136,8 +136,8 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       </div>
 
       {/* Right Column: Suggested Cards Stack or Comments Panel */}
-      <div className={`${isFullscreen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky overflow-y-hidden relative top-6 h-[calc(100vh-6.5rem)]`}>
-        {isCommentsOpen && !isFullscreen ? (
+      <div className={`${isFullscreen && !isCommentsOpen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky overflow-y-hidden relative top-6 h-[calc(100vh-6.5rem)]`}>
+        {isCommentsOpen ? (
           <CommentsPanel 
             onClose={() => setIsCommentsOpen(false)} 
             video={feedVideos.find(v => v.id === activeVideoId)} 
