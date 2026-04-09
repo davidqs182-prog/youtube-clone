@@ -78,7 +78,7 @@ export default function CommentsPanel({ onClose, video }: CommentsPanelProps) {
       </div>
 
       {/* Scrollable Comments List */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-4 py-4 pb-28">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar overscroll-contain px-4 py-4">
         <div className="flex flex-col gap-6">
           {mockComments.map(comment => (
             <div key={comment.id} className="flex gap-4">
@@ -121,7 +121,7 @@ export default function CommentsPanel({ onClose, video }: CommentsPanelProps) {
       </div>
 
       {/* Sticky Bottom Input Area */}
-      <div className="absolute bottom-0 left-0 right-0 bg-[#0f0f0f]/95 backdrop-blur-md border-t border-[var(--yt-border)] px-4 py-3 shrink-0 flex flex-col gap-3">
+      <div className="w-full shrink-0 bg-[#0f0f0f]/95 backdrop-blur-md border-t border-[var(--yt-border)] px-4 py-3 flex flex-col gap-3">
         {/* Emojis Ribbon */}
         <div className="flex items-center justify-between px-1">
           {emojis.map((emoji, index) => (

@@ -143,7 +143,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
             video={feedVideos.find(v => v.id === activeVideoId)} 
           />
         ) : (
-          <div className="flex flex-col gap-4 pr-2 overflow-y-auto no-scrollbar h-full pb-10">
+          <div className="flex flex-col gap-4 pr-2 overflow-y-auto overscroll-contain no-scrollbar h-full pb-10">
             {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => {
                if (video.type === "collection") {
                  return <CollectionCard key={`sug-${video.id}-${idx}`} video={video} />;
