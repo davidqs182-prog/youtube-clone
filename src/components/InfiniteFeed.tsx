@@ -136,7 +136,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       </div>
 
       {/* Right Column: Suggested Cards Stack or Comments Panel */}
-      <div className={`${isFullscreen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky top-0 h-[calc(100vh-3.5rem)] overflow-y-hidden relative -mt-6`}>
+      <div className={`${isFullscreen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky top-20 h-[calc(100vh-6.5rem)] overflow-y-hidden relative`}>
         {isCommentsOpen && !isFullscreen ? (
           <CommentsPanel 
             onClose={() => setIsCommentsOpen(false)} 

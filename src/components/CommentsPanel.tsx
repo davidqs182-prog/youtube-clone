@@ -58,7 +58,7 @@ export default function CommentsPanel({ onClose, video }: CommentsPanelProps) {
   const emojis = ["❤️", "🙌", "🔥", "👏", "😢", "😍", "😮", "😂"];
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#0f0f0f] border border-[var(--yt-border)] rounded-xl overflow-hidden shrink-0 animate-in fade-in slide-in-from-right-4 duration-300 py-6">
+    <div className="w-full h-full flex flex-col bg-[#0f0f0f] border border-[var(--yt-border)] rounded-xl overflow-hidden shrink-0 animate-in fade-in slide-in-from-right-4 duration-300">
       
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--yt-border)] shrink-0">
