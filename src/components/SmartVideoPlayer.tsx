@@ -65,6 +65,23 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const durationRef = useRef(0);
   const isDraggingRef = useRef(false);
 
+  const callYt = (method: string, ...args: any[]) => {
+    if (!ytPlayer) return 0;
+    try {
+      const fn = (ytPlayer as any)[method];
+      if (typeof fn === 'function') {
+        const res = fn.bind(ytPlayer)(...args);
+        if (res && res.catch) {
+          res.catch((e:any) => console.warn(`[YT Player] Ignored async error for ${method}:`, e));
+        }
+        return res;
+      }
+    } catch (e) {
+      console.warn(`[YT Player] Ignored sync error for ${method}:`, e);
+    }
+    return 0;
+  };
+
   const formatTime = (seconds: number) => {
     if (!seconds || isNaN(seconds)) return "0:00";
     const h = Math.floor(seconds / 3600);
@@ -87,9 +104,9 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     if (isActive) {
       hasEndedRef.current = false;
       if (video.youtubeId && ytPlayer) {
-        ytPlayer.playVideo();
+        callYt('playVideo');
         setIsPlaying(true);
-        globalMuted ? ytPlayer.mute() : ytPlayer.unMute();
+        globalMuted ? callYt('mute') : callYt('unMute');
       } else if (videoRef.current) {
         const playPromise = videoRef.current.play();
         if (playPromise !== undefined) {
@@ -104,7 +121,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       }
     } else {
       if (video.youtubeId && ytPlayer) {
-        ytPlayer.pauseVideo();
+        callYt('pauseVideo');
       } else if (videoRef.current) {
         videoRef.current.pause();
       }
@@ -118,7 +135,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   useEffect(() => {
     if (isActive && isTrailerMode && video.highlights.length > 0) {
       if (video.youtubeId && ytPlayer) {
-         ytPlayer.seekTo(video.highlights[0].start, true);
+         callYt('seekTo', video.highlights[0].start, true);
       } else if (videoRef.current) {
          videoRef.current.currentTime = video.highlights[0].start;
       }
@@ -135,8 +152,8 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       let currentTime = 0;
       let duration = 0;
       if (video.youtubeId && ytPlayer) {
-        currentTime = ytPlayer.getCurrentTime() || 0;
-        duration = ytPlayer.getDuration() || 0;
+        currentTime = callYt('getCurrentTime') || 0;
+        duration = callYt('getDuration') || 0;
       } else if (videoRef.current) {
         currentTime = videoRef.current.currentTime;
         duration = videoRef.current.duration || 0;
@@ -164,7 +181,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
             const nextIndex = currentHighlightIndex + 1;
             setCurrentHighlightIndex(nextIndex);
             if (video.youtubeId && ytPlayer) {
-               ytPlayer.seekTo(video.highlights[nextIndex].start, true);
+               callYt('seekTo', video.highlights[nextIndex].start, true);
             } else if (videoRef.current) {
                videoRef.current.currentTime = video.highlights[nextIndex].start;
             }
@@ -174,7 +191,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
                 const nextIndex = 0;
                 setCurrentHighlightIndex(nextIndex);
                 if (video.youtubeId && ytPlayer) {
-                   ytPlayer.seekTo(video.highlights[nextIndex].start, true);
+                   callYt('seekTo', video.highlights[nextIndex].start, true);
                 } else if (videoRef.current) {
                    videoRef.current.currentTime = video.highlights[nextIndex].start;
                 }
@@ -207,8 +224,8 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     if (isTrailerMode) {
       exitTrailerMode();
       if (video.youtubeId && ytPlayer) {
-        ytPlayer.seekTo(0, true);
-        ytPlayer.playVideo();
+        callYt('seekTo', 0, true);
+        callYt('playVideo');
       } else if (videoRef.current) {
         videoRef.current.currentTime = 0;
         videoRef.current.play();
@@ -219,14 +236,14 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     
     if (isPlaying) {
       if (video.youtubeId && ytPlayer) {
-        ytPlayer.pauseVideo();
+        callYt('pauseVideo');
       } else if (videoRef.current) {
         videoRef.current.pause();
       }
       setIsPlaying(false);
     } else {
       if (video.youtubeId && ytPlayer) {
-         ytPlayer.playVideo();
+         callYt('playVideo');
       } else if (videoRef.current) {
          videoRef.current.play();
       }
@@ -257,7 +274,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     const newTime = percent * durationRef.current;
     
     if (video.youtubeId && ytPlayer) {
-      ytPlayer.seekTo(newTime, true);
+      callYt('seekTo', newTime, true);
     } else if (videoRef.current) {
       videoRef.current.currentTime = newTime;
     }
@@ -273,7 +290,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     updateScrubberFromEvent(e);
     
     // Pause briefly while dragging
-    if (video.youtubeId && ytPlayer) ytPlayer.pauseVideo();
+    if (video.youtubeId && ytPlayer) callYt('pauseVideo');
     else if (videoRef.current) videoRef.current.pause();
   };
 
@@ -292,7 +309,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
         if (!isPlaying) {
           togglePlay();
         } else {
-          if (video.youtubeId && ytPlayer) ytPlayer.playVideo();
+          if (video.youtubeId && ytPlayer) callYt('playVideo');
           else if (videoRef.current) videoRef.current.play();
         }
       }
@@ -335,7 +352,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     const newMuteState = !globalMuted;
     setGlobalMuted(newMuteState);
     if (video.youtubeId && ytPlayer) {
-      newMuteState ? ytPlayer.mute() : ytPlayer.unMute();
+      newMuteState ? callYt('mute') : callYt('unMute');
     } else if (videoRef.current) {
       videoRef.current.muted = newMuteState;
     }
