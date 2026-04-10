@@ -71,6 +71,29 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const timeTextRef = useRef<HTMLSpanElement>(null);
   const durationRef = useRef(0);
   const isDraggingRef = useRef(false);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [idleHidden, setIdleHidden] = useState(false);
+
+  /** Reset the 4-second idle timer. Only active when playing (not trailer mode). */
+  const resetIdleTimer = () => {
+    if (!isActive || isTrailerMode) return;
+    if (idleHidden) setIdleHidden(false);
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = setTimeout(() => setIdleHidden(true), 4000);
+  };
+
+  const handleMouseLeave = () => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    setIdleHidden(false);
+  };
+
+  // Clear idle timer when video becomes inactive or trailer mode reactivates
+  useEffect(() => {
+    if (!isActive || isTrailerMode) {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      setIdleHidden(false);
+    }
+  }, [isActive, isTrailerMode]);
 
   const callYt = (method: string, ...args: any[]) => {
     if (!ytPlayer || !isPlayerReadyRef.current) return 0;
@@ -444,11 +467,17 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     }
   };
 
+  // Whether to include the 'group' class (drives all group-hover:* visibility).
+  // Removing it hides controls/title/description even while hovering (idle state).
+  const showGroupClass = !idleHidden || isTrailerMode;
+
   return (
     <div 
       ref={containerRef}
-      className="relative w-full rounded-[10px] overflow-hidden group aspect-video bg-black"
+      className={`relative w-full rounded-[10px] overflow-hidden aspect-video bg-black ${showGroupClass ? 'group' : 'cursor-none'}`}
       onClick={togglePlay}
+      onMouseMove={resetIdleTimer}
+      onMouseLeave={handleMouseLeave}
     >
       {video.youtubeId ? (
         <div className="absolute inset-0 pointer-events-none">
