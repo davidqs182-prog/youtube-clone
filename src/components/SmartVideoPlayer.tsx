@@ -95,6 +95,18 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     }
   }, [isActive, isTrailerMode]);
 
+  // Auto-start the 4s idle timer the moment the user starts playing (no mouse move needed)
+  useEffect(() => {
+    if (isActive && isPlaying && !isTrailerMode) {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      setIdleHidden(false); // ensure controls are visible first
+      hideTimerRef.current = setTimeout(() => setIdleHidden(true), 4000);
+    }
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, [isActive, isPlaying, isTrailerMode]);
+
   const callYt = (method: string, ...args: any[]) => {
     if (!ytPlayer || !isPlayerReadyRef.current) return 0;
     try {
@@ -623,7 +635,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       </div>
 
       {/* Right Side Interaction Bar (TikTok style) */}
-      <div className="absolute top-1/2 -translate-y-1/2 right-3 md:right-5 flex flex-col items-center gap-5 z-20 pointer-events-auto">
+      <div className={`absolute top-1/2 -translate-y-1/2 right-3 md:right-5 flex flex-col items-center gap-5 z-20 pointer-events-auto transition-opacity duration-500 ${idleHidden && !isTrailerMode ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
 
          {/* Profile Badge (Subscribe Action) */}
          <div className="flex flex-col items-center gap-1 cursor-pointer hover:scale-105 transition-transform mb-2">
