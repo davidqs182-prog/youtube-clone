@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import AppLayout from "@/components/AppLayout";
+import YtErrorSuppressor from "@/components/YtErrorSuppressor";
 
 const roboto = Roboto({
   weight: ['400', '500', '700'],
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${roboto.variable} antialiased`} suppressHydrationWarning>
       <body suppressHydrationWarning className="bg-[var(--yt-bg)] text-[var(--yt-text)] overflow-hidden">
+        <YtErrorSuppressor />
         <AppLayout>{children}</AppLayout>
       </body>
     </html>
   );
 }
+

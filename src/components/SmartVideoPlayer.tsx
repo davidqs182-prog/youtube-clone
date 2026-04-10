@@ -39,6 +39,7 @@ interface SmartVideoPlayerProps {
 export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, globalMuted, setGlobalMuted, isCommentsOpen, onOpenComments }: SmartVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ytPlayer, setYtPlayer] = useState<YouTubePlayer>(null);
+  const isPlayerReadyRef = useRef(false);   // true only after onYtReady fires — guards callYt
   const hasEndedRef = useRef(false);
   const [videoError, setVideoError] = useState(false);
   
@@ -46,6 +47,12 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
   const [currentCaption, setCurrentCaption] = useState("");
   const [trailerLoopCount, setTrailerLoopCount] = useState(0);
+
+  // Reset player readiness whenever the video changes so stale player isn't used
+  useEffect(() => {
+    isPlayerReadyRef.current = false;
+    setYtPlayer(null);
+  }, [video.youtubeId]);
 
   useEffect(() => {
     if (!isCommentsOpen && trailerLoopCount > 0) {
@@ -66,7 +73,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const isDraggingRef = useRef(false);
 
   const callYt = (method: string, ...args: any[]) => {
-    if (!ytPlayer) return 0;
+    if (!ytPlayer || !isPlayerReadyRef.current) return 0;
     try {
       const fn = (ytPlayer as any)[method];
       if (typeof fn === 'function') {
@@ -80,6 +87,28 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       console.warn(`[YT Player] Ignored sync error for ${method}:`, e);
     }
     return 0;
+  };
+
+  /**
+   * Pauses + mutes the player without the readiness guard.
+   * Uses pauseVideo (NOT stopVideo) — stopVideo emits state -1 which would
+   * prevent future playVideo calls from working.
+   */
+  const forceStopYt = (playerInstance?: any) => {
+    const p = playerInstance ?? ytPlayer;
+    if (!p) return;
+    try { (p as any).mute?.(); } catch (_) {}
+    try { (p as any).pauseVideo?.(); } catch (_) {}
+  };
+
+  /** Applies mute state to the player without the readiness guard. */
+  const forceApplyMute = (muted: boolean, playerInstance?: any) => {
+    const p = playerInstance ?? ytPlayer;
+    if (!p) return;
+    try {
+      if (muted) (p as any).mute?.();
+      else (p as any).unMute?.();
+    } catch (_) {}
   };
 
   const formatTime = (seconds: number) => {
@@ -104,9 +133,14 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     if (isActive) {
       hasEndedRef.current = false;
       if (video.youtubeId && ytPlayer) {
-        callYt('playVideo');
-        setIsPlaying(true);
-        globalMuted ? callYt('mute') : callYt('unMute');
+        // Small defer — the YT IFrame API may still be bootstrapping internally
+        // even after onReady fires; calling playVideo immediately can crash.
+        const t = setTimeout(() => {
+          callYt('playVideo');
+          setIsPlaying(true);
+          forceApplyMute(globalMuted);
+        }, 150);
+        return () => clearTimeout(t);
       } else if (videoRef.current) {
         const playPromise = videoRef.current.play();
         if (playPromise !== undefined) {
@@ -120,8 +154,9 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
         }
       }
     } else {
-      if (video.youtubeId && ytPlayer) {
-        callYt('pauseVideo');
+      // IMPORTANT: use forceStopYt (no readiness guard) so audio always stops on swipe
+      if (video.youtubeId) {
+        forceStopYt();
       } else if (videoRef.current) {
         videoRef.current.pause();
       }
@@ -129,7 +164,19 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       setIsTrailerMode(true);
       setCurrentHighlightIndex(0);
     }
-  }, [isActive, ytPlayer, video.youtubeId, globalMuted, setGlobalMuted]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, ytPlayer, video.youtubeId]);
+
+  // Propagate globalMuted to YT player immediately whenever it changes
+  useEffect(() => {
+    if (video.youtubeId) {
+      forceApplyMute(globalMuted);
+      if (videoRef.current) videoRef.current.muted = globalMuted;
+    } else if (videoRef.current) {
+      videoRef.current.muted = globalMuted;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalMuted]);
 
   // Jump to first highlight when becoming active in trailer mode
   useEffect(() => {
@@ -350,26 +397,33 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     const newMuteState = !globalMuted;
-    setGlobalMuted(newMuteState);
-    if (video.youtubeId && ytPlayer) {
-      newMuteState ? callYt('mute') : callYt('unMute');
-    } else if (videoRef.current) {
-      videoRef.current.muted = newMuteState;
-    }
+    setGlobalMuted(newMuteState); // triggers the globalMuted useEffect above
+    // Also apply directly in case the effect hasn't run yet
+    forceApplyMute(newMuteState);
+    if (videoRef.current) videoRef.current.muted = newMuteState;
   };
 
   const onYtReady = (event: any) => {
+    isPlayerReadyRef.current = true;
     setYtPlayer(event.target);
-    if (globalMuted) {
-      event.target.mute();
-    } else {
-      event.target.unMute();
+    // Apply current mute state as soon as the player is ready
+    forceApplyMute(globalMuted, event.target);
+    // If this video is not the active one, immediately stop it
+    if (!isActive) {
+      forceStopYt(event.target);
     }
+  };
+
+  const onYtError = () => {
+    // If the player reports an error reset readiness so callYt stays silent
+    isPlayerReadyRef.current = false;
   };
 
   const onYtStateChange = (event: any) => {
     if (event.data === 1) setIsPlaying(true);
     if (event.data === 2) setIsPlaying(false);
+    // NOTE: do NOT reset isPlayerReadyRef on state -1 (UNSTARTED).
+    // stopVideo/pauseVideo can trigger -1 and we still want callYt to work after.
   };
 
   const ytOptions = {
@@ -403,6 +457,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
              opts={ytOptions} 
              onReady={onYtReady} 
              onStateChange={onYtStateChange}
+             onError={onYtError}
              className="w-[100%] h-[100%] scale-[1.3] transition-opacity duration-300" 
            />
         </div>
