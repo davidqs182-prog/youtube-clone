@@ -63,6 +63,8 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const scrubberContainerRef = useRef<HTMLDivElement>(null);
@@ -647,20 +649,46 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
             </div>
          </div>
 
-         {/* Like */}
-         <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-            <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
-               <ThumbsUp size={24} fill="currentColor" className="opacity-100"/>
-            </div>
-            <span className="text-white text-[12px] font-semibold drop-shadow-md">{video.likes || "10K"}</span>
-         </div>
+         {/* Like / Dislike - vertical pill radio */}
+         <div className="flex flex-col items-center gap-1.5">
+            <div className="flex flex-col items-center bg-black/30 backdrop-blur-md rounded-full overflow-hidden border border-white/10 shadow-lg">
 
-         {/* Dislike */}
-         <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-            <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
-               <ThumbsDown size={24} fill="currentColor" className="opacity-100 mt-0.5"/>
+              {/* Thumbs Up */}
+              <button
+                onClick={(e) => { e.stopPropagation(); setLiked(l => !l); if (!liked) setDisliked(false); }}
+                className={`flex flex-col items-center gap-0.5 px-3 pt-3 pb-2 w-full hover:bg-white/10 transition-all duration-200 ${
+                  liked ? 'text-blue-400' : 'text-white'
+                }`}
+              >
+                <ThumbsUp
+                  size={24}
+                  fill={liked ? 'currentColor' : 'none'}
+                  strokeWidth={liked ? 0 : 2}
+                  className="transition-transform duration-200 active:scale-90"
+                />
+                <span className="text-[11px] font-semibold tabular-nums">
+                  {video.likes || '10K'}
+                </span>
+              </button>
+
+              {/* Divider */}
+              <div className="w-full h-px bg-white/15" />
+
+              {/* Thumbs Down */}
+              <button
+                onClick={(e) => { e.stopPropagation(); setDisliked(d => !d); if (!disliked) setLiked(false); }}
+                className={`flex flex-col items-center gap-0.5 px-3 pt-2 pb-3 w-full hover:bg-white/10 transition-all duration-200 ${
+                  disliked ? 'text-red-400' : 'text-white'
+                }`}
+              >
+                <ThumbsDown
+                  size={24}
+                  fill={disliked ? 'currentColor' : 'none'}
+                  strokeWidth={disliked ? 0 : 2}
+                  className="transition-transform duration-200 active:scale-90 mt-0.5"
+                />
+              </button>
             </div>
-            <span className="text-white text-[12px] font-semibold drop-shadow-md">Dislike</span>
          </div>
 
          {/* Comment */}
@@ -690,6 +718,20 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
             <div className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors">
                <MoreHorizontal size={24} />
             </div>
+         </div>
+
+         {/* Ask */}
+         <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors"
+            >
+              {/* Sparkle icon — matches the Ask button in YouTube */}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 opacity-100">
+                <path d="M12 2 L13.5 9 L20 10.5 L13.5 12 L12 19 L10.5 12 L4 10.5 L10.5 9 Z" />
+              </svg>
+            </div>
+            <span className="text-white text-[12px] font-semibold drop-shadow-md">Ask</span>
          </div>
       </div>
 

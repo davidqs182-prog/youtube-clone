@@ -34,9 +34,15 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   const [globalMuted, setGlobalMuted] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // currentIndex tracks position in the TRIPLED array (0 … 3N-1)
   const currentIndex = useRef<number>(0);
+  const isJumpingRef = useRef<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
+
+  const N = feedVideos.length;
+  // Triple the feed so the user can scroll in both directions indefinitely
+  const tripleVideos = [...feedVideos, ...feedVideos, ...feedVideos];
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -46,22 +52,58 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
+  // On first render, jump to the start of the middle block (index N) instantly
+  useEffect(() => {
+    if (N === 0) return;
+    const startRef = videoRefs.current[N];
+    if (startRef) {
+      startRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+      currentIndex.current = N;
+      setActiveVideoId(tripleVideos[N].id + `-${N}`);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [N]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-            const id = entry.target.getAttribute("data-id");
-            setActiveVideoId(id);
-            const idx = feedVideos.findIndex(v => v.id === id);
-            if (idx !== -1) currentIndex.current = idx;
+            const rawId = entry.target.getAttribute("data-id");
+            const idxAttr = entry.target.getAttribute("data-index");
+            const idx = idxAttr !== null ? parseInt(idxAttr, 10) : -1;
+
+            if (idx === -1 || isJumpingRef.current) return;
+
+            setActiveVideoId(rawId);
+            currentIndex.current = idx;
+
+            // When approaching first third → silently jump to equivalent in middle third
+            if (idx < N) {
+              isJumpingRef.current = true;
+              const targetRef = videoRefs.current[idx + N];
+              if (targetRef) {
+                targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+                currentIndex.current = idx + N;
+                setActiveVideoId(tripleVideos[idx + N].id + `-${idx + N}`);
+              }
+              setTimeout(() => { isJumpingRef.current = false; }, 100);
+            }
+            // When approaching last third → silently jump to equivalent in middle third
+            else if (idx >= 2 * N) {
+              isJumpingRef.current = true;
+              const targetRef = videoRefs.current[idx - N];
+              if (targetRef) {
+                targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+                currentIndex.current = idx - N;
+                setActiveVideoId(tripleVideos[idx - N].id + `-${idx - N}`);
+              }
+              setTimeout(() => { isJumpingRef.current = false; }, 100);
+            }
           }
         });
       },
-      {
-        root: null,
-        threshold: 0.6,
-      }
+      { root: null, threshold: 0.6 }
     );
 
     videoRefs.current.forEach((ref) => {
@@ -69,19 +111,17 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
     });
 
     return () => observer.disconnect();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedVideos]);
 
-  // Keyboard navigation for jumping between videos
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
       if (e.key === "ArrowDown") {
         e.preventDefault();
         const nextIndex = currentIndex.current + 1;
-        if (nextIndex < feedVideos.length) {
-          videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
+        videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         const prevIndex = currentIndex.current - 1;
@@ -90,17 +130,14 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
         }
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [feedVideos]);
 
-  const handleTrailerEnd = (index: number) => {
-    if (index < feedVideos.length - 1) {
-      const nextRef = videoRefs.current[index + 1];
-      if (nextRef) {
-        nextRef.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+  const handleTrailerEnd = (tripleIdx: number) => {
+    const nextRef = videoRefs.current[tripleIdx + 1];
+    if (nextRef) {
+      nextRef.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
@@ -109,30 +146,35 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       
       {/* Left Column: Infinite Snapping Feed */}
       <div className={`flex-1 w-full flex flex-col ${isFullscreen && !isCommentsOpen ? 'gap-0' : 'gap-10 md:gap-16'}`}>
-        {feedVideos.map((video, idx) => (
-          <div 
-            key={video.id} 
-            data-id={video.id}
-            ref={(el) => { videoRefs.current[idx] = el; }}
-            className={`w-full flex flex-col snap-center transition-transform duration-500 ${isFullscreen && !isCommentsOpen ? 'h-[100vh] justify-center' : 'gap-4'}`}
-            style={{ 
-              transform: activeVideoId === video.id || (isFullscreen && !isCommentsOpen) ? "scale(1)" : "scale(0.96)"
-            }}
-          >
-            {/* Google AI / Gemini brand gradient border */}
-            <div className={`w-full relative transition-all duration-500 ${isFullscreen && !isCommentsOpen ? '' : 'rounded-xl p-[3px] gemini-border'} ${activeVideoId === video.id ? 'opacity-100 gemini-glow' : 'opacity-40'}`}>
-              <SmartVideoPlayer 
-                video={video} 
-                isActive={activeVideoId === video.id}
-                onTrailerEnd={() => handleTrailerEnd(idx)} 
-                globalMuted={globalMuted}
-                setGlobalMuted={setGlobalMuted}
-                isCommentsOpen={isCommentsOpen && activeVideoId === video.id}
-                onOpenComments={() => setIsCommentsOpen(true)}
-              />
+        {tripleVideos.map((video, idx) => {
+          const compositeId = `${video.id}-${idx}`;
+          const isActive = activeVideoId === compositeId;
+          return (
+            <div 
+              key={compositeId}
+              data-id={compositeId}
+              data-index={idx}
+              ref={(el) => { videoRefs.current[idx] = el; }}
+              className={`w-full flex flex-col snap-center transition-transform duration-500 ${isFullscreen && !isCommentsOpen ? 'h-[100vh] justify-center' : 'gap-4'}`}
+              style={{ 
+                transform: isActive || (isFullscreen && !isCommentsOpen) ? "scale(1)" : "scale(0.96)"
+              }}
+            >
+              {/* Google AI / Gemini brand gradient border */}
+              <div className={`w-full relative transition-all duration-500 ${isFullscreen && !isCommentsOpen ? '' : 'rounded-xl p-[3px] gemini-border'} ${isActive ? 'opacity-100 gemini-glow' : 'opacity-40'}`}>
+                <SmartVideoPlayer 
+                  video={video} 
+                  isActive={isActive}
+                  onTrailerEnd={() => handleTrailerEnd(idx)} 
+                  globalMuted={globalMuted}
+                  setGlobalMuted={setGlobalMuted}
+                  isCommentsOpen={isCommentsOpen && isActive}
+                  onOpenComments={() => setIsCommentsOpen(true)}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Right Column: Suggested Cards Stack or Comments Panel */}
@@ -140,7 +182,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
         {isCommentsOpen ? (
           <CommentsPanel 
             onClose={() => setIsCommentsOpen(false)} 
-            video={feedVideos.find(v => v.id === activeVideoId)} 
+            video={feedVideos.find(v => activeVideoId?.startsWith(v.id))} 
           />
         ) : (
           <div className="flex flex-col gap-4 pr-2 overflow-y-auto overscroll-contain no-scrollbar h-full pb-10">
