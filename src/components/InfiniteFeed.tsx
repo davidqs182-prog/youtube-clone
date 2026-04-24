@@ -40,6 +40,10 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
 
+  // Custom Scroll Lock Refs
+  const isScrollingRef = useRef<boolean>(false);
+  const touchStartRef = useRef<number>(0);
+
   const N = feedVideos.length;
   // Triple the feed so the user can scroll in both directions indefinitely
   const tripleVideos = [...feedVideos, ...feedVideos, ...feedVideos];
@@ -133,6 +137,86 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [feedVideos]);
+
+  // Gestor de navegación 1x1 estricto (Rueda y Táctil)
+  useEffect(() => {
+    const isScrollablePanel = (target: EventTarget | null) => {
+      if (!target) return false;
+      const el = target as HTMLElement;
+      // Permite el scroll nativo dentro de paneles de sugerencias, descripciones o comentarios
+      return el.closest('.overflow-y-auto') || el.closest('.overflow-auto');
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (isScrollablePanel(e.target)) return;
+
+      // Importante: Secuestra el scroll completo de la ventana
+      e.preventDefault();
+
+      if (isScrollingRef.current) return;
+
+      if (e.deltaY > 0) {
+        isScrollingRef.current = true;
+        const nextIndex = currentIndex.current + 1;
+        videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => isScrollingRef.current = false, 750);
+      } else if (e.deltaY < 0) {
+        isScrollingRef.current = true;
+        const prevIndex = currentIndex.current - 1;
+        if (prevIndex >= 0) {
+          videoRefs.current[prevIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        setTimeout(() => isScrollingRef.current = false, 750);
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (isScrollablePanel(e.target)) return;
+      touchStartRef.current = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isScrollablePanel(e.target)) return;
+      e.preventDefault(); // Detiene "arrastre" libre en la pantalla principal
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isScrollablePanel(e.target)) return;
+      if (isScrollingRef.current) return;
+
+      const touchEnd = e.changedTouches[0].clientY;
+      const delta = touchStartRef.current - touchEnd;
+
+      if (Math.abs(delta) > 40) { // Distancia mínima para considerar un swipe
+        if (delta > 0) {
+          isScrollingRef.current = true;
+          const nextIndex = currentIndex.current + 1;
+          videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => isScrollingRef.current = false, 750);
+        } else {
+          isScrollingRef.current = true;
+          const prevIndex = currentIndex.current - 1;
+          if (prevIndex >= 0) {
+            videoRefs.current[prevIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+          setTimeout(() => isScrollingRef.current = false, 750);
+        }
+      }
+    };
+
+    // passive: false permite cancelar el evento con preventDefault
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, []);
 
   const handleTrailerEnd = (tripleIdx: number) => {
     const nextRef = videoRefs.current[tripleIdx + 1];

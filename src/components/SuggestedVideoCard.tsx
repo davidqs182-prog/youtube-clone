@@ -10,10 +10,19 @@ export default function SuggestedVideoCard({ video }: { video: any }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Only trigger inView if the card is mostly visible
-        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          // Debounce to prevent massive concurrent loading during fast scrolling
+          timeoutId = setTimeout(() => {
+            setInView(true);
+          }, 500);
+        } else {
+          clearTimeout(timeoutId);
+          setInView(false);
+        }
       },
       { threshold: 0.6 } 
     );
@@ -23,6 +32,7 @@ export default function SuggestedVideoCard({ video }: { video: any }) {
     }
 
     return () => {
+      clearTimeout(timeoutId);
       observer.disconnect();
     };
   }, []);

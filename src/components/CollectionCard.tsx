@@ -10,9 +10,18 @@ export default function CollectionCard({ video }: { video: any }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          timeoutId = setTimeout(() => {
+            setInView(true);
+          }, 500);
+        } else {
+          clearTimeout(timeoutId);
+          setInView(false);
+        }
       },
       { threshold: 0.6 } 
     );
@@ -22,6 +31,7 @@ export default function CollectionCard({ video }: { video: any }) {
     }
 
     return () => {
+      clearTimeout(timeoutId);
       observer.disconnect();
     };
   }, []);

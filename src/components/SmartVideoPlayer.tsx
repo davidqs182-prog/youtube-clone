@@ -493,7 +493,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       onMouseMove={resetIdleTimer}
       onMouseLeave={handleMouseLeave}
     >
-      {video.youtubeId ? (
+      {video.youtubeId && isActive ? (
         <div className="absolute inset-0 pointer-events-none">
            <YouTube 
              videoId={video.youtubeId} 
@@ -504,8 +504,8 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
              className="w-[100%] h-[100%] scale-[1.3] transition-opacity duration-300" 
            />
         </div>
-      ) : videoError || !video.url ? (
-        // Fallback: show thumbnail when video URL is missing or fails
+      ) : (video.youtubeId && !isActive) || videoError || !video.url ? (
+        // Fallback: show thumbnail when inactive or when video URL is missing or fails
         <img
           src={video.thumbnail}
           alt={video.title}
