@@ -31,7 +31,7 @@ interface VideoData {
 
 export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVideos: VideoData[], suggestedVideos: VideoData[] }) {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-  const [globalMuted, setGlobalMuted] = useState<boolean>(false);
+  const [globalMuted, setGlobalMuted] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
   // currentIndex tracks position in the TRIPLED array (0 … 3N-1)

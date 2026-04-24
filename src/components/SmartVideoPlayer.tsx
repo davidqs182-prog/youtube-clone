@@ -467,7 +467,8 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     width: "100%",
     height: "100%",
     playerVars: {
-      autoplay: 0,
+      autoplay: 1,
+      mute: globalMuted ? 1 : 0,
       controls: 0,
       disablekb: 1,
       fs: 0,
