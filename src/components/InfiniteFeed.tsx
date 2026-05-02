@@ -239,7 +239,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
               data-id={compositeId}
               data-index={idx}
               ref={(el) => { videoRefs.current[idx] = el; }}
-              className={`w-full flex flex-col snap-center transition-transform duration-500 ${isFullscreen && !isCommentsOpen ? 'h-[100vh] justify-center' : 'gap-4'}`}
+              className={`w-full flex flex-col snap-center snap-always transition-transform duration-500 ${isFullscreen && !isCommentsOpen ? 'h-[100vh] justify-center' : 'gap-4'}`}
               style={{ 
                 transform: isActive || (isFullscreen && !isCommentsOpen) ? "scale(1)" : "scale(0.96)"
               }}
