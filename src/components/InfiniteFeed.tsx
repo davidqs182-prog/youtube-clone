@@ -50,7 +50,14 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const isFs = !!document.fullscreenElement;
+      setIsFullscreen(isFs);
+      const activeRef = videoRefs.current[currentIndex.current];
+      if (activeRef) {
+        setTimeout(() => {
+          activeRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+        }, 50);
+      }
     };
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
