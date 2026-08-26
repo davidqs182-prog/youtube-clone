@@ -338,11 +338,8 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const toggleFullscreen = (e?: React.MouseEvent | KeyboardEvent) => {
     e?.stopPropagation();
     if (!document.fullscreenElement) {
-      const mainEl = document.querySelector('main');
-      if (mainEl) {
-        mainEl.requestFullscreen().catch(err => console.error(err));
-      } else {
-        containerRef.current?.requestFullscreen().catch(err => console.error(err));
+      if (containerRef.current) {
+        containerRef.current.requestFullscreen().catch(err => console.error(err));
       }
       setIsFullscreen(true);
     } else {

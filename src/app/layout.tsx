@@ -13,6 +13,7 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "YouTube Clone",
   description: "A pixel-perfect YouTube clone with smart video feed.",
+  themeColor: "#0f0f0f",
 };
 
 export default function RootLayout({
@@ -21,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${roboto.variable} antialiased`} suppressHydrationWarning>
-      <body suppressHydrationWarning className="bg-[var(--yt-bg)] text-[var(--yt-text)] overflow-hidden">
+    <html lang="en" className={`${roboto.variable} dark antialiased`} style={{ colorScheme: 'dark' }} suppressHydrationWarning>
+      <body suppressHydrationWarning className="bg-[#0f0f0f] text-[#f1f1f1] overflow-hidden">
         <YtErrorSuppressor />
         <AppLayout>{children}</AppLayout>
       </body>
