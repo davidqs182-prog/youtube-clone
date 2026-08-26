@@ -34,9 +34,10 @@ interface SmartVideoPlayerProps {
   setGlobalMuted: (val: boolean) => void;
   isCommentsOpen?: boolean;
   onOpenComments?: () => void;
+  onExpand?: () => void;
 }
 
-export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, globalMuted, setGlobalMuted, isCommentsOpen, onOpenComments }: SmartVideoPlayerProps) {
+export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, globalMuted, setGlobalMuted, isCommentsOpen, onOpenComments, onExpand }: SmartVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ytPlayer, setYtPlayer] = useState<YouTubePlayer>(null);
   const isPlayerReadyRef = useRef(false);   // true only after onYtReady fires — guards callYt
@@ -337,6 +338,10 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
   const toggleFullscreen = (e?: React.MouseEvent | KeyboardEvent) => {
     e?.stopPropagation();
+    if (onExpand) {
+      onExpand();
+      return;
+    }
     if (!document.fullscreenElement) {
       if (containerRef.current) {
         containerRef.current.requestFullscreen().catch(err => console.error(err));
