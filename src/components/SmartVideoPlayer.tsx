@@ -115,14 +115,18 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     try {
       const fn = (ytPlayer as any)[method];
       if (typeof fn === 'function') {
-        const res = fn.bind(ytPlayer)(...args);
-        if (res && res.catch) {
-          res.catch((e:any) => console.warn(`[YT Player] Ignored async error for ${method}:`, e));
+        try {
+          const res = fn.bind(ytPlayer)(...args);
+          if (res && typeof res.catch === 'function') {
+            res.catch(() => {});
+          }
+          return res;
+        } catch (_) {
+          return 0;
         }
-        return res;
       }
-    } catch (e) {
-      console.warn(`[YT Player] Ignored sync error for ${method}:`, e);
+    } catch (_) {
+      return 0;
     }
     return 0;
   };
