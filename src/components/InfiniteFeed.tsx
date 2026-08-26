@@ -68,6 +68,31 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [N]);
 
+  const performSilentJumpIfNeeded = (idx: number) => {
+    if (N === 0 || isJumpingRef.current) return;
+    if (idx < N) {
+      isJumpingRef.current = true;
+      const targetIdx = idx + N;
+      const targetRef = videoRefs.current[targetIdx];
+      if (targetRef) {
+        targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+        currentIndex.current = targetIdx;
+        setActiveVideoId(tripleVideos[targetIdx].id + `-${targetIdx}`);
+      }
+      setTimeout(() => { isJumpingRef.current = false; }, 200);
+    } else if (idx >= 2 * N) {
+      isJumpingRef.current = true;
+      const targetIdx = idx - N;
+      const targetRef = videoRefs.current[targetIdx];
+      if (targetRef) {
+        targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+        currentIndex.current = targetIdx;
+        setActiveVideoId(tripleVideos[targetIdx].id + `-${targetIdx}`);
+      }
+      setTimeout(() => { isJumpingRef.current = false; }, 200);
+    }
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -81,29 +106,6 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
 
             setActiveVideoId(rawId);
             currentIndex.current = idx;
-
-            // When approaching first third → silently jump to equivalent in middle third
-            if (idx < N) {
-              isJumpingRef.current = true;
-              const targetRef = videoRefs.current[idx + N];
-              if (targetRef) {
-                targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
-                currentIndex.current = idx + N;
-                setActiveVideoId(tripleVideos[idx + N].id + `-${idx + N}`);
-              }
-              setTimeout(() => { isJumpingRef.current = false; }, 100);
-            }
-            // When approaching last third → silently jump to equivalent in middle third
-            else if (idx >= 2 * N) {
-              isJumpingRef.current = true;
-              const targetRef = videoRefs.current[idx - N];
-              if (targetRef) {
-                targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
-                currentIndex.current = idx - N;
-                setActiveVideoId(tripleVideos[idx - N].id + `-${idx - N}`);
-              }
-              setTimeout(() => { isJumpingRef.current = false; }, 100);
-            }
           }
         });
       },
@@ -125,12 +127,16 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       if (e.key === "ArrowDown") {
         e.preventDefault();
         const nextIndex = currentIndex.current + 1;
-        videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (videoRefs.current[nextIndex]) {
+          videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => performSilentJumpIfNeeded(nextIndex), 750);
+        }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         const prevIndex = currentIndex.current - 1;
-        if (prevIndex >= 0) {
+        if (prevIndex >= 0 && videoRefs.current[prevIndex]) {
           videoRefs.current[prevIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => performSilentJumpIfNeeded(prevIndex), 750);
         }
       }
     };
@@ -143,14 +149,11 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
     const isScrollablePanel = (target: EventTarget | null) => {
       if (!target) return false;
       const el = target as HTMLElement;
-      // Permite el scroll nativo dentro de paneles de sugerencias, descripciones o comentarios
       return el.closest('.overflow-y-auto') || el.closest('.overflow-auto');
     };
 
     const handleWheel = (e: WheelEvent) => {
       if (isScrollablePanel(e.target)) return;
-
-      // Importante: Secuestra el scroll completo de la ventana
       e.preventDefault();
 
       if (isScrollingRef.current) return;
@@ -158,15 +161,23 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       if (e.deltaY > 0) {
         isScrollingRef.current = true;
         const nextIndex = currentIndex.current + 1;
-        videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
-        setTimeout(() => isScrollingRef.current = false, 750);
+        if (videoRefs.current[nextIndex]) {
+          videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        setTimeout(() => {
+          isScrollingRef.current = false;
+          performSilentJumpIfNeeded(currentIndex.current);
+        }, 750);
       } else if (e.deltaY < 0) {
         isScrollingRef.current = true;
         const prevIndex = currentIndex.current - 1;
-        if (prevIndex >= 0) {
+        if (prevIndex >= 0 && videoRefs.current[prevIndex]) {
           videoRefs.current[prevIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
         }
-        setTimeout(() => isScrollingRef.current = false, 750);
+        setTimeout(() => {
+          isScrollingRef.current = false;
+          performSilentJumpIfNeeded(currentIndex.current);
+        }, 750);
       }
     };
 
@@ -177,7 +188,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
 
     const handleTouchMove = (e: TouchEvent) => {
       if (isScrollablePanel(e.target)) return;
-      e.preventDefault(); // Detiene "arrastre" libre en la pantalla principal
+      e.preventDefault();
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -187,19 +198,27 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       const touchEnd = e.changedTouches[0].clientY;
       const delta = touchStartRef.current - touchEnd;
 
-      if (Math.abs(delta) > 40) { // Distancia mínima para considerar un swipe
+      if (Math.abs(delta) > 40) {
         if (delta > 0) {
           isScrollingRef.current = true;
           const nextIndex = currentIndex.current + 1;
-          videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
-          setTimeout(() => isScrollingRef.current = false, 750);
+          if (videoRefs.current[nextIndex]) {
+            videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+          setTimeout(() => {
+            isScrollingRef.current = false;
+            performSilentJumpIfNeeded(currentIndex.current);
+          }, 750);
         } else {
           isScrollingRef.current = true;
           const prevIndex = currentIndex.current - 1;
-          if (prevIndex >= 0) {
+          if (prevIndex >= 0 && videoRefs.current[prevIndex]) {
             videoRefs.current[prevIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
           }
-          setTimeout(() => isScrollingRef.current = false, 750);
+          setTimeout(() => {
+            isScrollingRef.current = false;
+            performSilentJumpIfNeeded(currentIndex.current);
+          }, 750);
         }
       }
     };
