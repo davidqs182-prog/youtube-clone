@@ -72,6 +72,7 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const progressBarRef = useRef<HTMLDivElement>(null);
   const scrubberThumbRef = useRef<HTMLDivElement>(null);
   const timeTextRef = useRef<HTMLSpanElement>(null);
+  const savedPlaybackTimeRef = useRef<number>(0);
   const durationRef = useRef(0);
   const isDraggingRef = useRef(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -170,13 +171,16 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
+  const initializedRef = useRef(false);
+
   // Play/Pause Control
   useEffect(() => {
     if (isActive) {
-      hasEndedRef.current = false;
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        hasEndedRef.current = false;
+      }
       if (video.youtubeId && ytPlayer) {
-        // Small defer — the YT IFrame API may still be bootstrapping internally
-        // even after onReady fires; calling playVideo immediately can crash.
         const t = setTimeout(() => {
           callYt('playVideo');
           setIsPlaying(true);
@@ -190,13 +194,13 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
             if (videoRef.current) {
               videoRef.current.muted = true;
               setGlobalMuted(true);
-              videoRef.current.play().then(() => setIsPlaying(true)).catch(e => console.error(e));
+              videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
             }
           });
         }
       }
     } else {
-      // IMPORTANT: use forceStopYt (no readiness guard) so audio always stops on swipe
+      initializedRef.current = false;
       if (video.youtubeId) {
         forceStopYt();
       } else if (videoRef.current) {
@@ -220,9 +224,9 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalMuted]);
 
-  // Jump to first highlight when becoming active in trailer mode
+  // Jump to first highlight ONLY when video first becomes active in trailer mode
   useEffect(() => {
-    if (isActive && isTrailerMode && video.highlights.length > 0) {
+    if (isActive && isTrailerMode && !initializedRef.current && video.highlights.length > 0) {
       if (video.youtubeId && ytPlayer) {
          callYt('seekTo', video.highlights[0].start, true);
       } else if (videoRef.current) {
@@ -246,6 +250,10 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       } else if (videoRef.current) {
         currentTime = videoRef.current.currentTime;
         duration = videoRef.current.duration || 0;
+      }
+
+      if (currentTime > 0) {
+        savedPlaybackTimeRef.current = currentTime;
       }
 
       durationRef.current = duration;
@@ -449,9 +457,14 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const onYtReady = (event: any) => {
     isPlayerReadyRef.current = true;
     setYtPlayer(event.target);
-    // Apply current mute state as soon as the player is ready
     forceApplyMute(globalMuted, event.target);
-    // If this video is not the active one, immediately stop it
+    
+    if (savedPlaybackTimeRef.current > 0) {
+      try {
+        event.target.seekTo(savedPlaybackTimeRef.current, true);
+      } catch (_) {}
+    }
+
     if (!isActive) {
       forceStopYt(event.target);
     }

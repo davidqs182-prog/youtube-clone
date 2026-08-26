@@ -281,9 +281,6 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
                   isCommentsOpen={isCommentsOpen && isActive}
                   onOpenComments={() => setIsCommentsOpen(true)}
                   onExpand={() => {
-                    if (videoRefs.current[idx]) {
-                      videoRefs.current[idx]?.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
-                    }
                     const mainEl = document.querySelector('main');
                     if (mainEl && !document.fullscreenElement) {
                       mainEl.requestFullscreen().catch(() => {});
