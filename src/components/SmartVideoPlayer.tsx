@@ -501,14 +501,14 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
       onMouseLeave={handleMouseLeave}
     >
       {video.youtubeId && isActive ? (
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
            <YouTube 
              videoId={video.youtubeId} 
              opts={ytOptions} 
              onReady={onYtReady} 
              onStateChange={onYtStateChange}
              onError={onYtError}
-             className="w-[100%] h-[100%] scale-[1.3] transition-opacity duration-300" 
+             className="w-[100%] h-[100%] scale-[1.35] transition-opacity duration-300 pointer-events-none [&>iframe]:pointer-events-none [&>iframe]:w-full [&>iframe]:h-full" 
            />
         </div>
       ) : (video.youtubeId && !isActive) || videoError || !video.url ? (
