@@ -3,6 +3,7 @@
 import { useState } from "react";
 import TopNav from "./TopNav";
 import Sidebar from "./Sidebar";
+import GridOverlay from "./GridOverlay";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -13,6 +14,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[var(--yt-bg)] text-[var(--yt-text)]">
+      <GridOverlay />
       <TopNav toggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />

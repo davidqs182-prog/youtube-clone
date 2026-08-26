@@ -226,10 +226,10 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   };
 
   return (
-    <div className={`w-full flex justify-center ${isFullscreen && !isCommentsOpen ? 'flex-col p-0 gap-0' : 'flex-col xl:flex-row px-4 xl:px-6 py-6 gap-6 xl:gap-10 pb-32'}`}>
+    <div className={`w-full ${isFullscreen && !isCommentsOpen ? 'flex flex-col p-0 gap-0' : 'grid grid-cols-12 px-4 xl:px-6 py-6 gap-4 xl:gap-6 pb-32'}`}>
       
-      {/* Left Column: Infinite Snapping Feed */}
-      <div className={`flex-1 w-full flex flex-col ${isFullscreen && !isCommentsOpen ? 'gap-0' : 'gap-10 md:gap-16'}`}>
+      {/* Left Column: Main Playback Video Feed (Spans 9 Columns of 12) */}
+      <div className={`${isFullscreen && !isCommentsOpen ? 'w-full flex flex-col gap-0' : 'col-span-12 xl:col-span-9 w-full flex flex-col gap-10 md:gap-16'}`}>
         {tripleVideos.map((video, idx) => {
           const compositeId = `${video.id}-${idx}`;
           const isActive = activeVideoId === compositeId;
@@ -261,15 +261,15 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
         })}
       </div>
 
-      {/* Right Column: Suggested Cards Stack or Comments Panel */}
-      <div className={`${isFullscreen && !isCommentsOpen ? 'hidden' : 'hidden xl:flex'} w-[420px] flex-col gap-4 flex-shrink-0 sticky overflow-y-hidden relative top-6 h-[calc(100vh-6.5rem)]`}>
+      {/* Right Column: Suggested Cards Stack or Comments Panel (Spans 3 Columns of 12) */}
+      <div className={`${isFullscreen && !isCommentsOpen ? 'hidden' : 'hidden xl:flex'} col-span-12 xl:col-span-3 w-full flex-col gap-4 sticky overflow-y-hidden relative top-6 h-[calc(100vh-6.5rem)]`}>
         {isCommentsOpen ? (
           <CommentsPanel 
             onClose={() => setIsCommentsOpen(false)} 
             video={feedVideos.find(v => activeVideoId?.startsWith(v.id))} 
           />
         ) : (
-          <div className="flex flex-col gap-4 pr-2 overflow-y-auto overscroll-contain no-scrollbar h-full pb-10">
+          <div className="flex flex-col gap-4 pr-2 overflow-y-auto overscroll-contain no-scrollbar h-full pb-10 w-full">
             {[...suggestedVideos, ...suggestedVideos, ...suggestedVideos].map((video, idx) => {
                if (video.type === "collection") {
                  return <CollectionCard key={`sug-${video.id}-${idx}`} video={video} />;
