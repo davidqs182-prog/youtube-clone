@@ -8,8 +8,6 @@ interface Highlight {
   start: number;
   end: number;
   caption: string;
-  webmUrl?: string;
-  gifUrl?: string;
 }
 
 interface VideoData {
@@ -25,6 +23,8 @@ interface VideoData {
   comments?: string;
   description?: string;
   thumbnail?: string;
+  singleWebmUrl?: string;
+  singleMp4Url?: string;
   highlights: Highlight[];
 }
 
@@ -163,48 +163,58 @@ export default function SmartVideoPlayer({
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // Current active highlight sources
-  const currentHighlight = video.highlights && video.highlights[currentHighlightIndex];
-  const currentGifUrl = currentHighlight?.gifUrl || `/videos/trailers/${video.youtubeId}_h${currentHighlightIndex}.gif`;
-
-  // Highlight timer & segment progress bar animation
+  // Programmatic Playback Control for Single HTML5 Trailer Video
   useEffect(() => {
-    if (!isActive || !isTrailerMode) {
-      setHighlightProgress(0);
-      return;
-    }
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-    const duration = currentHighlight?.end ? (currentHighlight.end - currentHighlight.start) : 5;
-    const durationMs = duration * 1000;
-    const startTime = Date.now();
-
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(1, elapsed / durationMs);
-      setHighlightProgress(progress);
-
-      if (elapsed >= durationMs) {
-        clearInterval(interval);
-        if (currentHighlightIndex < video.highlights.length - 1) {
-          setCurrentHighlightIndex(prev => prev + 1);
-          setHighlightProgress(0);
-        } else {
-          if (!hasEndedRef.current) {
-            if (isCommentsOpen) {
-              setCurrentHighlightIndex(0);
-              setHighlightProgress(0);
-              setTrailerLoopCount(prev => prev + 1);
-            } else {
-              hasEndedRef.current = true;
-              onTrailerEnd();
-            }
-          }
-        }
+    if (isActive && isTrailerMode) {
+      videoEl.muted = globalMuted;
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          videoEl.muted = true;
+          videoEl.play().catch(() => {});
+        });
       }
-    }, 40);
+    } else {
+      videoEl.pause();
+    }
+  }, [isActive, isTrailerMode, globalMuted]);
 
-    return () => clearInterval(interval);
-  }, [isActive, isTrailerMode, currentHighlightIndex, isCommentsOpen, video.highlights]);
+  // Single HTML5 Video Time Update & Highlight Segment Calculation
+  const handleTrailerTimeUpdate = () => {
+    const v = videoRef.current;
+    if (!v || !v.duration || isNaN(v.duration) || v.duration <= 0) return;
+
+    const numHighlights = video.highlights.length || 1;
+    const segmentDuration = v.duration / numHighlights;
+    const currentTime = v.currentTime;
+
+    const activeIdx = Math.min(numHighlights - 1, Math.floor(currentTime / segmentDuration));
+    const segmentTime = currentTime % segmentDuration;
+    const segmentProgress = segmentTime / segmentDuration;
+
+    setCurrentHighlightIndex(activeIdx);
+    setHighlightProgress(segmentProgress);
+  };
+
+  const handleTrailerEnded = () => {
+    if (!hasEndedRef.current) {
+      if (isCommentsOpen) {
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+          videoRef.current.play().catch(() => {});
+        }
+        setCurrentHighlightIndex(0);
+        setHighlightProgress(0);
+        setTrailerLoopCount(prev => prev + 1);
+      } else {
+        hasEndedRef.current = true;
+        onTrailerEnd();
+      }
+    }
+  };
 
   // Full YouTube Player Progress Loop
   useEffect(() => {
@@ -333,6 +343,7 @@ export default function SmartVideoPlayer({
     const newMuteState = !globalMuted;
     setGlobalMuted(newMuteState);
     forceApplyMute(newMuteState);
+    if (videoRef.current) videoRef.current.muted = newMuteState;
   };
 
   const onYtReady = (event: any) => {
@@ -385,16 +396,23 @@ export default function SmartVideoPlayer({
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
 
-      {/* 1. Animated GIF Trailer Highlight Previews (Overlays thumbnail at z-10 when active) */}
+      {/* 1. Single HTML5 Video Trailer Highlight Mode (Renders single video at z-10 when active) */}
       {isTrailerMode && isActive && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-10">
-          <img
-            key={`${video.id}-gif-${currentHighlightIndex}`}
-            src={currentGifUrl}
-            alt={video.title}
-            className="w-full h-full object-cover pointer-events-none"
-          />
-        </div>
+        <video
+          ref={videoRef}
+          autoPlay
+          muted={globalMuted}
+          playsInline
+          disablePictureInPicture
+          controlsList="nodownload nofullscreen noremoteplayback"
+          onTimeUpdate={handleTrailerTimeUpdate}
+          onEnded={handleTrailerEnded}
+          onError={handleTrailerEnded}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+        >
+          {video.singleWebmUrl && <source src={video.singleWebmUrl} type="video/webm" />}
+          {video.singleMp4Url && <source src={video.singleMp4Url} type="video/mp4" />}
+        </video>
       )}
 
       {/* 2. Full YouTube Playback Mode (Renders at z-20 when user clicks card to play full video) */}

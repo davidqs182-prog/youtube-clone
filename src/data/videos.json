@@ -35,7 +35,9 @@
           "webmUrl": "/videos/trailers/FDXHEruN4wE_h2.webm",
           "gifUrl": "/videos/trailers/FDXHEruN4wE_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/FDXHEruN4wE_full.webm",
+      "singleMp4Url": "/videos/trailers/FDXHEruN4wE_full.mp4"
     },
     {
       "id": "vid-1",
@@ -72,7 +74,9 @@
           "webmUrl": "/videos/trailers/779if6cYvdw_h2.webm",
           "gifUrl": "/videos/trailers/779if6cYvdw_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/779if6cYvdw_full.webm",
+      "singleMp4Url": "/videos/trailers/779if6cYvdw_full.mp4"
     },
     {
       "id": "vid-dance-1",
@@ -109,7 +113,9 @@
           "webmUrl": "/videos/trailers/aVk9D4DlT84_h2.webm",
           "gifUrl": "/videos/trailers/aVk9D4DlT84_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/aVk9D4DlT84_full.webm",
+      "singleMp4Url": "/videos/trailers/aVk9D4DlT84_full.mp4"
     },
     {
       "id": "vid-gaming-1",
@@ -146,7 +152,9 @@
           "webmUrl": "/videos/trailers/p60HEWUPJ10_h2.webm",
           "gifUrl": "/videos/trailers/p60HEWUPJ10_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/p60HEWUPJ10_full.webm",
+      "singleMp4Url": "/videos/trailers/p60HEWUPJ10_full.mp4"
     },
     {
       "id": "vid-sports-2",
@@ -183,7 +191,9 @@
           "webmUrl": "/videos/trailers/CGRzfUccmNE_h2.webm",
           "gifUrl": "/videos/trailers/CGRzfUccmNE_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/CGRzfUccmNE_full.webm",
+      "singleMp4Url": "/videos/trailers/CGRzfUccmNE_full.mp4"
     },
     {
       "id": "vid-dance-2",
@@ -213,7 +223,9 @@
           "webmUrl": "/videos/trailers/suny-SfWufU_h1.webm",
           "gifUrl": "/videos/trailers/suny-SfWufU_h1.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/suny-SfWufU_full.webm",
+      "singleMp4Url": "/videos/trailers/suny-SfWufU_full.mp4"
     },
     {
       "id": "vid-gaming-2",
@@ -243,7 +255,9 @@
           "webmUrl": "/videos/trailers/l9m4cW2yxy0_h1.webm",
           "gifUrl": "/videos/trailers/l9m4cW2yxy0_h1.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/l9m4cW2yxy0_full.webm",
+      "singleMp4Url": "/videos/trailers/l9m4cW2yxy0_full.mp4"
     },
     {
       "id": "vid-sports-4",
@@ -273,7 +287,9 @@
           "webmUrl": "/videos/trailers/ma67yOdMQfs_h1.webm",
           "gifUrl": "/videos/trailers/ma67yOdMQfs_h1.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/ma67yOdMQfs_full.webm",
+      "singleMp4Url": "/videos/trailers/ma67yOdMQfs_full.mp4"
     },
     {
       "id": "feed-camping-2",
@@ -308,7 +324,9 @@
           "webmUrl": "/videos/trailers/unkKlhgP4y4_h2.webm",
           "gifUrl": "/videos/trailers/unkKlhgP4y4_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/unkKlhgP4y4_full.webm",
+      "singleMp4Url": "/videos/trailers/unkKlhgP4y4_full.mp4"
     },
     {
       "id": "feed-sports-2",
@@ -343,7 +361,9 @@
           "webmUrl": "/videos/trailers/ES2EMAUlspM_h2.webm",
           "gifUrl": "/videos/trailers/ES2EMAUlspM_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/ES2EMAUlspM_full.webm",
+      "singleMp4Url": "/videos/trailers/ES2EMAUlspM_full.mp4"
     },
     {
       "id": "feed-yoga-2",
@@ -378,7 +398,9 @@
           "webmUrl": "/videos/trailers/sTANio_2E0Q_h2.webm",
           "gifUrl": "/videos/trailers/sTANio_2E0Q_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/sTANio_2E0Q_full.webm",
+      "singleMp4Url": "/videos/trailers/sTANio_2E0Q_full.mp4"
     },
     {
       "id": "feed-dance-4",
@@ -413,7 +435,9 @@
           "webmUrl": "/videos/trailers/43DWlD0jtAo_h2.webm",
           "gifUrl": "/videos/trailers/43DWlD0jtAo_h2.gif"
         }
-      ]
+      ],
+      "singleWebmUrl": "/videos/trailers/43DWlD0jtAo_full.webm",
+      "singleMp4Url": "/videos/trailers/43DWlD0jtAo_full.mp4"
     }
   ],
   "suggestedVideos": [
