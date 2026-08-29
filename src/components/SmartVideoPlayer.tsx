@@ -163,7 +163,7 @@ export default function SmartVideoPlayer({
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // Programmatic Playback Control for Single HTML5 Trailer Video
+  // Programmatic Playback Control for Single MP4 Trailer Video
   useEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) return;
@@ -182,7 +182,7 @@ export default function SmartVideoPlayer({
     }
   }, [isActive, isTrailerMode, globalMuted]);
 
-  // Single HTML5 Video Time Update & Highlight Segment Calculation
+  // Single HTML5 MP4 Video Time Update & Highlight Segment Calculation
   const handleTrailerTimeUpdate = () => {
     const v = videoRef.current;
     if (!v || !v.duration || isNaN(v.duration) || v.duration <= 0) return;
@@ -396,7 +396,7 @@ export default function SmartVideoPlayer({
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
 
-      {/* 1. Single HTML5 Video Trailer Highlight Mode (Renders single video at z-10 when active) */}
+      {/* 1. Single HTML5 MP4 Video Trailer Highlight Mode (version 3 .mp4) */}
       {isTrailerMode && isActive && (
         <video
           ref={videoRef}
@@ -410,7 +410,6 @@ export default function SmartVideoPlayer({
           onError={handleTrailerEnded}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
         >
-          {video.singleWebmUrl && <source src={video.singleWebmUrl} type="video/webm" />}
           {video.singleMp4Url && <source src={video.singleMp4Url} type="video/mp4" />}
         </video>
       )}
