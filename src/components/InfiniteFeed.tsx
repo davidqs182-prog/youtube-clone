@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import SmartVideoPlayer from "./SmartVideoPlayer";
 import SuggestedVideoCard from "./SuggestedVideoCard";
 import CollectionCard from "./CollectionCard";
@@ -10,10 +10,12 @@ interface Highlight {
   start: number;
   end: number;
   caption: string;
+  webmUrl?: string;
 }
 
 interface VideoData {
   id: string;
+  youtubeId?: string;
   url: string;
   title: string;
   author: string;
@@ -23,45 +25,47 @@ interface VideoData {
   likes?: string;
   comments?: string;
   description?: string;
-  thumbnail: string;
+  thumbnail?: string;
   highlights: Highlight[];
-  type?: string;
-  category?: string;
 }
 
-export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVideos: VideoData[], suggestedVideos: VideoData[] }) {
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-  const [globalMuted, setGlobalMuted] = useState<boolean>(true);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
-  // currentIndex tracks position in the TRIPLED array (0 … 3N-1)
-  const currentIndex = useRef<number>(0);
-  const isJumpingRef = useRef<boolean>(false);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
+interface SuggestedVideo {
+  id: string;
+  youtubeId: string;
+  title: string;
+  channelName: string;
+  views: string;
+  timestamp: string;
+  avatarUrl: string;
+  thumbnailUrl: string;
+  videoUrl?: string;
+  gifUrl?: string;
+  duration?: string;
+  badges?: string[];
+  type?: string;
+  videosCount?: string;
+}
 
-  // Custom Scroll Lock Refs
-  const isScrollingRef = useRef<boolean>(false);
-  const touchStartRef = useRef<number>(0);
+interface InfiniteFeedProps {
+  feedVideos: VideoData[];
+  suggestedVideos: SuggestedVideo[];
+}
 
+export default function InfiniteFeed({ feedVideos, suggestedVideos }: InfiniteFeedProps) {
   const N = feedVideos.length;
   // Triple the feed so the user can scroll in both directions indefinitely
   const tripleVideos = [...feedVideos, ...feedVideos, ...feedVideos];
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      const isFs = !!document.fullscreenElement;
-      setIsFullscreen(isFs);
-      const activeRef = videoRefs.current[currentIndex.current];
-      if (activeRef) {
-        setTimeout(() => {
-          activeRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
-        }, 50);
-      }
-    };
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [globalMuted, setGlobalMuted] = useState(true);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const currentIndex = useRef<number>(N);
+  const isScrollingRef = useRef<boolean>(false);
+  const touchStartRef = useRef<number>(0);
+  const isJumpingRef = useRef<boolean>(false);
 
   // On first render, jump to the start of the middle block (index N) instantly
   useEffect(() => {
@@ -75,48 +79,41 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [N]);
 
-  const performSilentJumpIfNeeded = (idx: number) => {
-    if (N === 0 || isJumpingRef.current) return;
-    if (idx < N) {
-      isJumpingRef.current = true;
-      const targetIdx = idx + N;
-      const targetRef = videoRefs.current[targetIdx];
-      if (targetRef) {
-        targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
-        currentIndex.current = targetIdx;
-        setActiveVideoId(tripleVideos[targetIdx].id + `-${targetIdx}`);
-      }
-      setTimeout(() => { isJumpingRef.current = false; }, 200);
-    } else if (idx >= 2 * N) {
-      isJumpingRef.current = true;
-      const targetIdx = idx - N;
-      const targetRef = videoRefs.current[targetIdx];
-      if (targetRef) {
-        targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
-        currentIndex.current = targetIdx;
-        setActiveVideoId(tripleVideos[targetIdx].id + `-${targetIdx}`);
-      }
-      setTimeout(() => { isJumpingRef.current = false; }, 200);
-    }
-  };
+  // Handle Fullscreen listener
+  useEffect(() => {
+    const handleFs = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFs);
+    return () => document.removeEventListener("fullscreenchange", handleFs);
+  }, []);
 
+  // IntersectionObserver finding the most visible card in viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        let bestEntry: IntersectionObserverEntry | null = null;
+        let maxRatio = 0;
+
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-            const rawId = entry.target.getAttribute("data-id");
-            const idxAttr = entry.target.getAttribute("data-index");
-            const idx = idxAttr !== null ? parseInt(idxAttr, 10) : -1;
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            bestEntry = entry;
+          }
+        });
 
-            if (idx === -1 || isJumpingRef.current) return;
+        if (bestEntry && maxRatio >= 0.35 && !isJumpingRef.current) {
+          const rawId = (bestEntry as IntersectionObserverEntry).target.getAttribute("data-id");
+          const idxAttr = (bestEntry as IntersectionObserverEntry).target.getAttribute("data-index");
+          const idx = idxAttr !== null ? parseInt(idxAttr, 10) : -1;
 
+          if (rawId && idx !== -1) {
             setActiveVideoId(rawId);
             currentIndex.current = idx;
           }
-        });
+        }
       },
-      { root: null, threshold: 0.6 }
+      { root: null, threshold: [0.1, 0.35, 0.6, 0.8, 1.0] }
     );
 
     videoRefs.current.forEach((ref) => {
@@ -127,6 +124,33 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedVideos]);
 
+  // Silent infinite looping scroll jump
+  const performSilentJumpIfNeeded = (index: number) => {
+    if (N === 0) return;
+
+    if (index < N) {
+      isJumpingRef.current = true;
+      const targetIndex = index + N;
+      const targetRef = videoRefs.current[targetIndex];
+      if (targetRef) {
+        targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+        currentIndex.current = targetIndex;
+        setActiveVideoId(tripleVideos[targetIndex].id + `-${targetIndex}`);
+      }
+      setTimeout(() => { isJumpingRef.current = false; }, 50);
+    } else if (index >= 2 * N) {
+      isJumpingRef.current = true;
+      const targetIndex = index - N;
+      const targetRef = videoRefs.current[targetIndex];
+      if (targetRef) {
+        targetRef.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+        currentIndex.current = targetIndex;
+        setActiveVideoId(tripleVideos[targetIndex].id + `-${targetIndex}`);
+      }
+      setTimeout(() => { isJumpingRef.current = false; }, 50);
+    }
+  };
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -136,14 +160,14 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
         const nextIndex = currentIndex.current + 1;
         if (videoRefs.current[nextIndex]) {
           videoRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
-          setTimeout(() => performSilentJumpIfNeeded(nextIndex), 750);
+          performSilentJumpIfNeeded(nextIndex);
         }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         const prevIndex = currentIndex.current - 1;
         if (prevIndex >= 0 && videoRefs.current[prevIndex]) {
           videoRefs.current[prevIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
-          setTimeout(() => performSilentJumpIfNeeded(prevIndex), 750);
+          performSilentJumpIfNeeded(prevIndex);
         }
       }
     };
@@ -230,7 +254,6 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: { feedVide
       }
     };
 
-    // passive: false permite cancelar el evento con preventDefault
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("touchstart", handleTouchStart, { passive: false });
     window.addEventListener("touchmove", handleTouchMove, { passive: false });

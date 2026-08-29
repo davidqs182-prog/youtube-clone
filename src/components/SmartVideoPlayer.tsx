@@ -1,13 +1,15 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { Volume2, VolumeX, ThumbsUp, ThumbsDown, MessageSquare, Share2, MoreHorizontal, Play } from "lucide-react";
+import { Volume2, VolumeX, ThumbsUp, ThumbsDown, MessageSquare, Share2, MoreHorizontal } from "lucide-react";
 import YouTube, { YouTubePlayer } from "react-youtube";
 
 interface Highlight {
   start: number;
   end: number;
   caption: string;
+  webmUrl?: string;
+  gifUrl?: string;
 }
 
 interface VideoData {
@@ -37,30 +39,27 @@ interface SmartVideoPlayerProps {
   onExpand?: () => void;
 }
 
-export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, globalMuted, setGlobalMuted, isCommentsOpen, onOpenComments, onExpand }: SmartVideoPlayerProps) {
+export default function SmartVideoPlayer({ 
+  video, 
+  isActive, 
+  onTrailerEnd, 
+  globalMuted, 
+  setGlobalMuted, 
+  isCommentsOpen, 
+  onOpenComments, 
+  onExpand 
+}: SmartVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ytPlayer, setYtPlayer] = useState<YouTubePlayer>(null);
-  const isPlayerReadyRef = useRef(false);   // true only after onYtReady fires — guards callYt
+  const isPlayerReadyRef = useRef(false);
   const hasEndedRef = useRef(false);
   const [videoError, setVideoError] = useState(false);
   
+  // Trailer mode vs Full YouTube Playback mode
   const [isTrailerMode, setIsTrailerMode] = useState(true);
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
-  const [currentCaption, setCurrentCaption] = useState("");
+  const [highlightProgress, setHighlightProgress] = useState(0);
   const [trailerLoopCount, setTrailerLoopCount] = useState(0);
-
-  // Reset player readiness whenever the video changes so stale player isn't used
-  useEffect(() => {
-    isPlayerReadyRef.current = false;
-    setYtPlayer(null);
-  }, [video.youtubeId]);
-
-  useEffect(() => {
-    if (!isCommentsOpen && trailerLoopCount > 0) {
-      onTrailerEnd();
-      setTrailerLoopCount(0);
-    }
-  }, [isCommentsOpen, trailerLoopCount, onTrailerEnd]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -72,13 +71,29 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
   const progressBarRef = useRef<HTMLDivElement>(null);
   const scrubberThumbRef = useRef<HTMLDivElement>(null);
   const timeTextRef = useRef<HTMLSpanElement>(null);
-  const savedPlaybackTimeRef = useRef<number>(0);
   const durationRef = useRef(0);
   const isDraggingRef = useRef(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [idleHidden, setIdleHidden] = useState(false);
 
-  /** Reset the 4-second idle timer. Only active when playing (not trailer mode). */
+  // Reset states whenever video changes or becomes inactive
+  useEffect(() => {
+    isPlayerReadyRef.current = false;
+    setYtPlayer(null);
+    setIsTrailerMode(true);
+    setCurrentHighlightIndex(0);
+    setHighlightProgress(0);
+    hasEndedRef.current = false;
+  }, [video.youtubeId, isActive]);
+
+  useEffect(() => {
+    if (!isCommentsOpen && trailerLoopCount > 0) {
+      onTrailerEnd();
+      setTrailerLoopCount(0);
+    }
+  }, [isCommentsOpen, trailerLoopCount, onTrailerEnd]);
+
+  /** Reset 4s idle timer for full player controls */
   const resetIdleTimer = () => {
     if (!isActive || isTrailerMode) return;
     if (idleHidden) setIdleHidden(false);
@@ -91,7 +106,6 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     setIdleHidden(false);
   };
 
-  // Clear idle timer when video becomes inactive or trailer mode reactivates
   useEffect(() => {
     if (!isActive || isTrailerMode) {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
@@ -99,11 +113,10 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     }
   }, [isActive, isTrailerMode]);
 
-  // Auto-start the 4s idle timer the moment the user starts playing (no mouse move needed)
   useEffect(() => {
     if (isActive && isPlaying && !isTrailerMode) {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-      setIdleHidden(false); // ensure controls are visible first
+      setIdleHidden(false);
       hideTimerRef.current = setTimeout(() => setIdleHidden(true), 4000);
     }
     return () => {
@@ -116,35 +129,14 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     try {
       const fn = (ytPlayer as any)[method];
       if (typeof fn === 'function') {
-        try {
-          const res = fn.bind(ytPlayer)(...args);
-          if (res && typeof res.catch === 'function') {
-            res.catch(() => {});
-          }
-          return res;
-        } catch (_) {
-          return 0;
-        }
+        const res = fn.bind(ytPlayer)(...args);
+        if (res && typeof res.catch === 'function') res.catch(() => {});
+        return res;
       }
-    } catch (_) {
-      return 0;
-    }
+    } catch (_) {}
     return 0;
   };
 
-  /**
-   * Pauses + mutes the player without the readiness guard.
-   * Uses pauseVideo (NOT stopVideo) — stopVideo emits state -1 which would
-   * prevent future playVideo calls from working.
-   */
-  const forceStopYt = (playerInstance?: any) => {
-    const p = playerInstance ?? ytPlayer;
-    if (!p) return;
-    try { (p as any).mute?.(); } catch (_) {}
-    try { (p as any).pauseVideo?.(); } catch (_) {}
-  };
-
-  /** Applies mute state to the player without the readiness guard. */
   const forceApplyMute = (muted: boolean, playerInstance?: any) => {
     const p = playerInstance ?? ytPlayer;
     if (!p) return;
@@ -171,94 +163,64 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  const initializedRef = useRef(false);
+  // Current active highlight sources
+  const currentHighlight = video.highlights && video.highlights[currentHighlightIndex];
+  const currentGifUrl = currentHighlight?.gifUrl || `/videos/trailers/${video.youtubeId}_h${currentHighlightIndex}.gif`;
 
-  // Play/Pause Control
+  // Highlight timer & segment progress bar animation
   useEffect(() => {
-    if (isActive) {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        hasEndedRef.current = false;
-      }
-      if (video.youtubeId && ytPlayer) {
-        const t = setTimeout(() => {
-          callYt('playVideo');
-          setIsPlaying(true);
-          forceApplyMute(globalMuted);
-        }, 150);
-        return () => clearTimeout(t);
-      } else if (videoRef.current) {
-        const playPromise = videoRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => setIsPlaying(true)).catch(() => {
-            if (videoRef.current) {
-              videoRef.current.muted = true;
-              setGlobalMuted(true);
-              videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+    if (!isActive || !isTrailerMode) {
+      setHighlightProgress(0);
+      return;
+    }
+
+    const duration = currentHighlight?.end ? (currentHighlight.end - currentHighlight.start) : 5;
+    const durationMs = duration * 1000;
+    const startTime = Date.now();
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(1, elapsed / durationMs);
+      setHighlightProgress(progress);
+
+      if (elapsed >= durationMs) {
+        clearInterval(interval);
+        if (currentHighlightIndex < video.highlights.length - 1) {
+          setCurrentHighlightIndex(prev => prev + 1);
+          setHighlightProgress(0);
+        } else {
+          if (!hasEndedRef.current) {
+            if (isCommentsOpen) {
+              setCurrentHighlightIndex(0);
+              setHighlightProgress(0);
+              setTrailerLoopCount(prev => prev + 1);
+            } else {
+              hasEndedRef.current = true;
+              onTrailerEnd();
             }
-          });
+          }
         }
       }
-    } else {
-      initializedRef.current = false;
-      if (video.youtubeId) {
-        forceStopYt();
-      } else if (videoRef.current) {
-        videoRef.current.pause();
-      }
-      setIsPlaying(false);
-      setIsTrailerMode(true);
-      setCurrentHighlightIndex(0);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, ytPlayer, video.youtubeId]);
+    }, 40);
 
-  // Propagate globalMuted to YT player immediately whenever it changes
-  useEffect(() => {
-    if (video.youtubeId) {
-      forceApplyMute(globalMuted);
-      if (videoRef.current) videoRef.current.muted = globalMuted;
-    } else if (videoRef.current) {
-      videoRef.current.muted = globalMuted;
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalMuted]);
+    return () => clearInterval(interval);
+  }, [isActive, isTrailerMode, currentHighlightIndex, isCommentsOpen, video.highlights]);
 
-  // Jump to first highlight ONLY when video first becomes active in trailer mode
+  // Full YouTube Player Progress Loop
   useEffect(() => {
-    if (isActive && isTrailerMode && !initializedRef.current && video.highlights.length > 0) {
-      if (video.youtubeId && ytPlayer) {
-         callYt('seekTo', video.highlights[0].start, true);
-      } else if (videoRef.current) {
-         videoRef.current.currentTime = video.highlights[0].start;
-      }
-    }
-  }, [isActive, isTrailerMode, video.highlights, video.youtubeId, ytPlayer]);
-
-  // Unified RequestAnimationFrame loop for timing
-  useEffect(() => {
+    if (isTrailerMode || !isActive) return;
     let animationFrameId: number;
     
     const checkTime = () => {
-      if (!isActive) return;
-
       let currentTime = 0;
       let duration = 0;
       if (video.youtubeId && ytPlayer) {
         currentTime = callYt('getCurrentTime') || 0;
         duration = callYt('getDuration') || 0;
-      } else if (videoRef.current) {
-        currentTime = videoRef.current.currentTime;
-        duration = videoRef.current.duration || 0;
-      }
-
-      if (currentTime > 0) {
-        savedPlaybackTimeRef.current = currentTime;
       }
 
       durationRef.current = duration;
 
-      // Update UI refs directly to avoid re-renders
       if (duration > 0 && !isDraggingRef.current) {
          const percentage = (currentTime / duration) * 100;
          if (progressBarRef.current) progressBarRef.current.style.transform = `scaleX(${percentage / 100})`;
@@ -266,83 +228,36 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
          if (timeTextRef.current) timeTextRef.current.innerText = `${formatTime(currentTime)} / ${formatTime(duration)}`;
       }
 
-      if (isTrailerMode && video.highlights.length > 0) {
-        const currentHighlight = video.highlights[currentHighlightIndex];
-
-        if (currentTime >= currentHighlight.start && currentTime < currentHighlight.end) {
-          setCurrentCaption(currentHighlight.caption);
-        }
-
-        if (currentTime >= currentHighlight.end) {
-          if (currentHighlightIndex < video.highlights.length - 1) {
-            const nextIndex = currentHighlightIndex + 1;
-            setCurrentHighlightIndex(nextIndex);
-            if (video.youtubeId && ytPlayer) {
-               callYt('seekTo', video.highlights[nextIndex].start, true);
-            } else if (videoRef.current) {
-               videoRef.current.currentTime = video.highlights[nextIndex].start;
-            }
-          } else {
-            if (!hasEndedRef.current) {
-              if (isCommentsOpen) {
-                const nextIndex = 0;
-                setCurrentHighlightIndex(nextIndex);
-                if (video.youtubeId && ytPlayer) {
-                   callYt('seekTo', video.highlights[nextIndex].start, true);
-                } else if (videoRef.current) {
-                   videoRef.current.currentTime = video.highlights[nextIndex].start;
-                }
-                setTrailerLoopCount(prev => prev + 1);
-              } else {
-                hasEndedRef.current = true;
-                onTrailerEnd();
-              }
-            }
-          }
-        }
-      }
-
       animationFrameId = requestAnimationFrame(checkTime);
     };
 
     animationFrameId = requestAnimationFrame(checkTime);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isActive, isTrailerMode, ytPlayer, currentHighlightIndex, video, isCommentsOpen, onTrailerEnd]);
-
-  const exitTrailerMode = () => {
-    if (!isTrailerMode) return;
-    setIsTrailerMode(false);
-    setCurrentCaption("");
-  };
+  }, [isActive, isTrailerMode, ytPlayer, video]);
 
   const togglePlay = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     
+    // When clicking card during trailer mode -> Switch to Full YouTube Mode
     if (isTrailerMode) {
-      exitTrailerMode();
+      setIsTrailerMode(false);
+      setIsPlaying(true);
       if (video.youtubeId && ytPlayer) {
         callYt('seekTo', 0, true);
         callYt('playVideo');
-      } else if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play();
       }
-      setIsPlaying(true);
       return;
     }
     
+    // Toggle play/pause in full player mode
     if (isPlaying) {
       if (video.youtubeId && ytPlayer) {
         callYt('pauseVideo');
-      } else if (videoRef.current) {
-        videoRef.current.pause();
       }
       setIsPlaying(false);
     } else {
       if (video.youtubeId && ytPlayer) {
          callYt('playVideo');
-      } else if (videoRef.current) {
-         videoRef.current.play();
       }
       setIsPlaying(true);
     }
@@ -373,8 +288,6 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     
     if (video.youtubeId && ytPlayer) {
       callYt('seekTo', newTime, true);
-    } else if (videoRef.current) {
-      videoRef.current.currentTime = newTime;
     }
 
     if (progressBarRef.current) progressBarRef.current.style.transform = `scaleX(${percent})`;
@@ -383,32 +296,26 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    exitTrailerMode();
+    if (isTrailerMode) setIsTrailerMode(false);
     isDraggingRef.current = true;
     updateScrubberFromEvent(e);
     
-    // Pause briefly while dragging
     if (video.youtubeId && ytPlayer) callYt('pauseVideo');
-    else if (videoRef.current) videoRef.current.pause();
   };
 
-  // Setup global drag listeners
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
       if (!isDraggingRef.current) return;
       updateScrubberFromEvent(e);
     };
 
-    const handlePointerUp = (e: PointerEvent) => {
+    const handlePointerUp = () => {
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
-        
-        // Ensure play resumes after scrubbing
         if (!isPlaying) {
           togglePlay();
         } else {
           if (video.youtubeId && ytPlayer) callYt('playVideo');
-          else if (videoRef.current) videoRef.current.play();
         }
       }
     };
@@ -421,65 +328,25 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     };
   }, [isPlaying, video, ytPlayer]);
 
-  // Keyboard controls
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
-      
-      if (e.code === "Space" && isActive) {
-        e.preventDefault(); 
-        togglePlay();
-      }
-      
-      if ((e.key === "f" || e.key === "F") && isActive) {
-        e.preventDefault();
-        toggleFullscreen(e);
-      }
-    };
-    
-    if (isActive) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isActive, isPlaying, isTrailerMode, ytPlayer]);
-
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     const newMuteState = !globalMuted;
-    setGlobalMuted(newMuteState); // triggers the globalMuted useEffect above
-    // Also apply directly in case the effect hasn't run yet
+    setGlobalMuted(newMuteState);
     forceApplyMute(newMuteState);
-    if (videoRef.current) videoRef.current.muted = newMuteState;
   };
 
   const onYtReady = (event: any) => {
     isPlayerReadyRef.current = true;
     setYtPlayer(event.target);
     forceApplyMute(globalMuted, event.target);
-    
-    if (savedPlaybackTimeRef.current > 0) {
-      try {
-        event.target.seekTo(savedPlaybackTimeRef.current, true);
-      } catch (_) {}
+    if (!isTrailerMode) {
+      event.target.playVideo();
     }
-
-    if (!isActive) {
-      forceStopYt(event.target);
-    }
-  };
-
-  const onYtError = () => {
-    // If the player reports an error reset readiness so callYt stays silent
-    isPlayerReadyRef.current = false;
   };
 
   const onYtStateChange = (event: any) => {
     if (event.data === 1) setIsPlaying(true);
     if (event.data === 2) setIsPlaying(false);
-    // NOTE: do NOT reset isPlayerReadyRef on state -1 (UNSTARTED).
-    // stopVideo/pauseVideo can trigger -1 and we still want callYt to work after.
   };
 
   const ytOptions = {
@@ -501,50 +368,48 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
     }
   };
 
-  // Whether to include the 'group' class (drives all group-hover:* visibility).
-  // Removing it hides controls/title/description even while hovering (idle state).
   const showGroupClass = !idleHidden || isTrailerMode;
 
   return (
     <div 
       ref={containerRef}
-      className={`relative w-full rounded-[10px] overflow-hidden aspect-video bg-black ${showGroupClass ? 'group' : 'cursor-none'}`}
+      className={`relative w-full rounded-[10px] overflow-hidden aspect-video bg-black cursor-pointer ${showGroupClass ? 'group' : 'cursor-none'}`}
       onClick={togglePlay}
       onMouseMove={resetIdleTimer}
       onMouseLeave={handleMouseLeave}
     >
-      {video.youtubeId && isActive ? (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* 0. Static HD Thumbnail (ALWAYS mounted at z-0 as solid background fallback) */}
+      <img
+        src={video.thumbnail}
+        alt={video.title}
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      />
+
+      {/* 1. Animated GIF Trailer Highlight Previews (Overlays thumbnail at z-10 when active) */}
+      {isTrailerMode && isActive && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-10">
+          <img
+            key={`${video.id}-gif-${currentHighlightIndex}`}
+            src={currentGifUrl}
+            alt={video.title}
+            className="w-full h-full object-cover pointer-events-none"
+          />
+        </div>
+      )}
+
+      {/* 2. Full YouTube Playback Mode (Renders at z-20 when user clicks card to play full video) */}
+      {!isTrailerMode && video.youtubeId && isActive && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
            <YouTube 
              videoId={video.youtubeId} 
              opts={ytOptions} 
              onReady={onYtReady} 
              onStateChange={onYtStateChange}
-             onError={onYtError}
+             onError={() => setVideoError(true)}
              className="w-[100%] h-[100%] scale-[1.35] transition-opacity duration-300 pointer-events-none [&>iframe]:pointer-events-none [&>iframe]:w-full [&>iframe]:h-full" 
            />
         </div>
-      ) : (video.youtubeId && !isActive) || videoError || !video.url ? (
-        // Fallback: show thumbnail when inactive or when video URL is missing or fails
-        <img
-          src={video.thumbnail}
-          alt={video.title}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <video
-          ref={videoRef}
-          src={video.url}
-          className="w-full h-full object-cover"
-          muted={globalMuted}
-          loop={!isTrailerMode}
-          playsInline
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onError={() => setVideoError(true)}
-        />
       )}
-
 
       {/* Header Overlay (Mute only) */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-end items-start pointer-events-none z-40">
@@ -556,10 +421,10 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
         </button>
       </div>
 
-      {/* Controls Hover Overlay Container Add shadow gradient */}
+      {/* Controls Hover Overlay Container */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 pointer-events-none" />
 
-      {/* Title and Description - Shifts up on hover to make room for controls */}
+      {/* Title and Description */}
       <div className={`absolute left-0 right-16 px-6 pt-6 pb-0 flex flex-col justify-end pointer-events-none z-20 transition-all duration-200 bottom-[24px] group-hover:bottom-[100px] ${isTrailerMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
         <h2 className="text-white text-xl md:text-2xl font-bold leading-tight drop-shadow-lg line-clamp-2">
            {video.title}
@@ -569,97 +434,74 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
         </p>
       </div>
 
-      {/* YouTube Custom Controls - Reveal on Hover */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 px-4 pb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 flex flex-col gap-2 cursor-default pointer-events-none group-hover:pointer-events-auto"
-        onClick={(e) => e.stopPropagation()} // Prevent playing video when clicking controls area
-      >
-        
-        {/* Scrubber Area */}
+      {/* Controls (Revealed when in full play mode or on hover) */}
+      {!isTrailerMode && (
         <div 
-           ref={scrubberContainerRef}
-           className="w-full h-[24px] flex items-center cursor-pointer group/scrubber relative"
-           onPointerDown={handlePointerDown}
+          className="absolute bottom-0 left-0 right-0 px-4 pb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 flex flex-col gap-2 cursor-default pointer-events-none group-hover:pointer-events-auto"
+          onClick={(e) => e.stopPropagation()}
         >
-            <div className="w-full relative flex items-center h-full">
-               <div className="absolute w-full h-[4px] bg-white/40 rounded-full" />
-               <div 
-                 ref={progressBarRef} 
-                 className="absolute h-[4px] bg-[#ff0000] rounded-l-full will-change-transform" 
-                 style={{ width: "100%", transform: 'scaleX(0)', transformOrigin: '0 0' }}
-               />
-               <div 
-                 ref={scrubberThumbRef}
-                 className="absolute w-[14px] h-[14px] bg-[#ff0000] rounded-full shadow-sm will-change-left"
-                 style={{ left: '0%', transform: "translateX(-50%)" }}
-               />
-            </div>
-        </div>
+          {/* Scrubber Area */}
+          <div 
+             ref={scrubberContainerRef}
+             className="w-full h-[24px] flex items-center cursor-pointer group/scrubber relative"
+             onPointerDown={handlePointerDown}
+          >
+              <div className="w-full relative flex items-center h-full">
+                 <div className="absolute w-full h-[4px] bg-white/40 rounded-full" />
+                 <div 
+                   ref={progressBarRef} 
+                   className="absolute h-[4px] bg-[#ff0000] rounded-l-full will-change-transform" 
+                   style={{ width: "100%", transform: 'scaleX(0)', transformOrigin: '0 0' }}
+                 />
+                 <div 
+                   ref={scrubberThumbRef}
+                   className="absolute w-[14px] h-[14px] bg-[#ff0000] rounded-full shadow-sm will-change-left"
+                   style={{ left: '0%', transform: "translateX(-50%)" }}
+                 />
+              </div>
+          </div>
 
-        {/* Control Buttons */}
-        <div className="flex items-center justify-between">
-           {/* Left Controls */}
-           <div className="flex items-center gap-2">
-             <div className="p-[4px] bg-black/50 backdrop-blur-md rounded-full text-white">
-               <button onClick={togglePlay} className="p-[4px] hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
-                 {isPlaying && !isTrailerMode ? 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
-                 }
-               </button>
+          {/* Control Buttons */}
+          <div className="flex items-center justify-between">
+             <div className="flex items-center gap-2">
+               <div className="p-[4px] bg-black/50 backdrop-blur-md rounded-full text-white">
+                 <button onClick={togglePlay} className="p-[4px] hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                   {isPlaying ? 
+                     <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
+                     <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
+                   }
+                 </button>
+               </div>
+               <div className="p-[4px] bg-black/50 backdrop-blur-md rounded-full text-white">
+                 <button onClick={toggleMute} className="p-[4px] hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                   {globalMuted ? 
+                     <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
+                     <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
+                   }
+                 </button>
+               </div>
+               <div className="px-4 py-[16px] bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
+                  <span ref={timeTextRef} style={{fontFamily: "Roboto, Arial, sans-serif", fontSize: "14px"}}>0:00 / 0:00</span>
+               </div>
              </div>
-             <div className="p-[4px] bg-black/50 backdrop-blur-md rounded-full text-white">
-               <button onClick={toggleMute} className="p-[4px] hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
-                 {globalMuted ? 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
-                 }
-               </button>
-             </div>
-             <div className="px-4 py-[16px] bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
-                <span ref={timeTextRef} style={{fontFamily: "Roboto, Arial, sans-serif", fontSize: "14px"}}>0:00 / 0:00</span>
-             </div>
-           </div>
 
-           {/* Right Controls Pill */}
-           <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[4px] gap-[16px] text-white mr-2">
-             <div className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="6" width="18" height="12" rx="2" />
-                  <path d="M10 10.5h-2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h2" />
-                  <path d="M17 10.5h-2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h2" />
-                </svg>
+             <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[4px] gap-[16px] text-white mr-2">
+               <div onClick={toggleFullscreen} className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
+                 <svg width="36" height="36" viewBox="-2 -2 28 28" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                   <polyline points="9 5 5 5 5 9" />
+                   <line x1="5" y1="5" x2="11" y2="11" />
+                   <polyline points="15 19 19 19 19 15" />
+                   <line x1="19" y1="19" x2="13" y2="13" />
+                 </svg>
+               </div>
              </div>
-             <div className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
-                <svg width="36" height="36" viewBox="-3 -3 30 30" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3" />
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                </svg>
-             </div>
-             <div className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M 9 10 L 7 12 L 9 14"/>
-                  <path d="M 15 10 L 17 12 L 15 14"/>
-                  <path d="M 3 16 L 21 16"/>
-                  <rect x="3" y="6" width="18" height="12" rx="2"/>
-                </svg>
-             </div>
-             <div onClick={toggleFullscreen} className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
-               <svg width="36" height="36" viewBox="-2 -2 28 28" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-                 <polyline points="9 5 5 5 5 9" />
-                 <line x1="5" y1="5" x2="11" y2="11" />
-                 <polyline points="15 19 19 19 19 15" />
-                 <line x1="19" y1="19" x2="13" y2="13" />
-               </svg>
-             </div>
-           </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Right Side Interaction Bar (TikTok style) */}
       <div className={`absolute top-1/2 -translate-y-1/2 right-3 md:right-5 flex flex-col items-center gap-5 z-20 pointer-events-auto transition-opacity duration-500 ${idleHidden && !isTrailerMode ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-
-         {/* Profile Badge (Subscribe Action) */}
+         {/* Profile Badge */}
          <div className="flex flex-col items-center gap-1 cursor-pointer hover:scale-105 transition-transform mb-2">
             <div className="relative">
                <img src={video.avatar} className="w-12 h-12 rounded-full border-2 border-white object-cover shadow-sm" alt="Avatar"/>
@@ -669,11 +511,9 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
             </div>
          </div>
 
-         {/* Like / Dislike - vertical pill radio */}
+         {/* Like / Dislike */}
          <div className="flex flex-col items-center gap-1.5">
             <div className="flex flex-col items-center bg-black/30 backdrop-blur-md rounded-full overflow-hidden border border-white/10 shadow-lg">
-
-              {/* Thumbs Up */}
               <button
                 onClick={(e) => { e.stopPropagation(); setLiked(l => !l); if (!liked) setDisliked(false); }}
                 className={`flex flex-col items-center gap-0.5 px-3 pt-3 pb-2 w-full hover:bg-white/10 transition-all duration-200 ${
@@ -691,10 +531,8 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
                 </span>
               </button>
 
-              {/* Divider */}
               <div className="w-full h-px bg-white/15" />
 
-              {/* Thumbs Down */}
               <button
                 onClick={(e) => { e.stopPropagation(); setDisliked(d => !d); if (!disliked) setLiked(false); }}
                 className={`flex flex-col items-center gap-0.5 px-3 pt-2 pb-3 w-full hover:bg-white/10 transition-all duration-200 ${
@@ -739,31 +577,31 @@ export default function SmartVideoPlayer({ video, isActive, onTrailerEnd, global
                <MoreHorizontal size={24} />
             </div>
          </div>
-
-         {/* Ask */}
-         <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="w-12 h-12 bg-black/10 group-hover:bg-black/20 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors"
-            >
-              {/* Sparkle icon — matches the Ask button in YouTube */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 opacity-100">
-                <path d="M12 2 L13.5 9 L20 10.5 L13.5 12 L12 19 L10.5 12 L4 10.5 L10.5 9 Z" />
-              </svg>
-            </div>
-            <span className="text-white text-[12px] font-semibold drop-shadow-md">Ask</span>
-         </div>
       </div>
 
-      {/* Trailer Progress Indicator */}
-      {isTrailerMode && isActive && (
-         <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 pointer-events-none z-30">
-            {video.highlights.map((_, idx) => (
-              <div 
-                key={idx} 
-                className={`h-1 flex-1 rounded-full bg-white transition-opacity duration-300 shadow-sm ${idx <= currentHighlightIndex ? "opacity-100" : "opacity-30"}`}
-              />
-            ))}
+      {/* Top Segmented Progress Bar for Highlights in Trailer Mode */}
+      {isTrailerMode && isActive && video.highlights && (
+         <div className="absolute top-0 left-0 right-0 flex gap-1.5 p-3 pointer-events-none z-30">
+            {video.highlights.map((_, idx) => {
+              let widthPercent = 0;
+              if (idx < currentHighlightIndex) {
+                widthPercent = 100;
+              } else if (idx === currentHighlightIndex) {
+                widthPercent = Math.min(100, Math.max(0, highlightProgress * 100));
+              }
+
+              return (
+                <div 
+                  key={idx} 
+                  className="h-1 flex-1 rounded-full bg-white/30 overflow-hidden shadow-md backdrop-blur-sm"
+                >
+                  <div 
+                    className="h-full bg-white transition-all duration-75"
+                    style={{ width: `${widthPercent}%` }}
+                  />
+                </div>
+              );
+            })}
          </div>
       )}
     </div>
