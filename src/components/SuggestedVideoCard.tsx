@@ -1,30 +1,24 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import YouTube from "react-youtube";
 
-// Suggested Video Card with auto-playing video previews
+// Suggested Video Card with auto-playing GIF previews when visible in viewport
 export default function SuggestedVideoCard({ video }: { video: any }) {
   const [isHovered, setIsHovered] = useState(false);
   const [inView, setInView] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    const scrollContainer = cardRef.current?.closest('.overflow-y-auto') || null;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          // Debounce to prevent massive concurrent loading during fast scrolling
-          timeoutId = setTimeout(() => {
-            setInView(true);
-          }, 500);
-        } else {
-          clearTimeout(timeoutId);
-          setInView(false);
-        }
+        setInView(entry.isIntersecting);
       },
-      { threshold: 0.6 } 
+      { 
+        root: scrollContainer,
+        threshold: 0.15 
+      }
     );
 
     if (cardRef.current) {
@@ -32,31 +26,12 @@ export default function SuggestedVideoCard({ video }: { video: any }) {
     }
 
     return () => {
-      clearTimeout(timeoutId);
       observer.disconnect();
     };
   }, []);
 
-  const ytOptions = {
-    width: "100%",
-    height: "100%",
-    playerVars: {
-      autoplay: 1,
-      controls: 0,
-      disablekb: 1,
-      fs: 0,
-      rel: 0,
-      showinfo: 0,
-      modestbranding: 1,
-      playsinline: 1,
-      mute: 1,
-      origin: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
-      loop: 1,
-      playlist: video.youtubeId
-    }
-  };
-
   const shouldPlay = isHovered || inView;
+  const gifSrc = video.gifUrl;
 
   return (
     <div 
@@ -65,35 +40,20 @@ export default function SuggestedVideoCard({ video }: { video: any }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Static image that fades out when hovered so the video shows behind it */}
+      {/* Static thumbnail image (Always visible at z-0 as solid fallback) */}
       <img 
         src={video.thumbnail} 
         alt={video.title} 
-        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 z-0 ${shouldPlay ? 'scale-105 opacity-0 delay-[600ms]' : 'scale-100 opacity-100'}`} 
+        className="absolute inset-0 w-full h-full object-cover z-0" 
       />
 
-      {/* Inner Video Trailer Layer - Rendered conditionally */}
-      {shouldPlay && (
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          {video.youtubeId ? (
-            <div className="w-full h-full grid place-items-center bg-black">
-               <YouTube 
-                 videoId={video.youtubeId} 
-                 opts={ytOptions} 
-                 className="w-full h-full scale-[1.35]" 
-               />
-            </div>
-          ) : (
-            <video
-              src={video.url}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover bg-black"
-            />
-          )}
-        </div>
+      {/* Animated GIF Layer (Rendered at z-10 only when card is visible in viewport or hovered) */}
+      {shouldPlay && gifSrc && (
+        <img 
+          src={gifSrc} 
+          alt={video.title} 
+          className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none transition-opacity duration-300 opacity-100" 
+        />
       )}
 
       {/* Gradient for text legibility */}
