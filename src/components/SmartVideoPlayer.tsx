@@ -511,7 +511,7 @@ export default function SmartVideoPlayer({
              </div>
            </div>
 
-           <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[4px] gap-[16px] text-white mr-2">
+           <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[4px] text-white mr-0">
              <div onClick={toggleFullscreen} className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
                <svg width="36" height="36" viewBox="-2 -2 28 28" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                  <polyline points="9 5 5 5 5 9" />
