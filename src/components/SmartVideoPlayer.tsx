@@ -163,24 +163,39 @@ export default function SmartVideoPlayer({
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
+  const handleCanPlay = () => {
+    const v = videoRef.current;
+    if (v && isActive && isTrailerMode && v.paused) {
+      v.play().catch(() => {
+        v.muted = true;
+        v.play().catch(() => {});
+      });
+    }
+  };
+
   // Programmatic Playback Control for Single MP4 Trailer Video
   useEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
     if (isActive && isTrailerMode) {
+      hasEndedRef.current = false;
       videoEl.muted = globalMuted;
+      if (videoEl.ended) {
+        videoEl.currentTime = 0;
+      }
       const playPromise = videoEl.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
           videoEl.muted = true;
+          if (videoEl.ended) videoEl.currentTime = 0;
           videoEl.play().catch(() => {});
         });
       }
     } else {
       videoEl.pause();
     }
-  }, [isActive, isTrailerMode, globalMuted]);
+  }, [isActive, isTrailerMode, globalMuted, isFullscreen]);
 
   // Single HTML5 MP4 Video Time Update & Highlight Segment Calculation
   const handleTrailerTimeUpdate = () => {
@@ -403,12 +418,15 @@ export default function SmartVideoPlayer({
           autoPlay
           muted={globalMuted}
           playsInline
+          preload="auto"
           disablePictureInPicture
           controlsList="nodownload nofullscreen noremoteplayback"
+          onCanPlay={handleCanPlay}
+          onLoadedData={handleCanPlay}
           onTimeUpdate={handleTrailerTimeUpdate}
           onEnded={handleTrailerEnded}
           onError={handleTrailerEnded}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 transform-gpu will-change-transform"
         >
           {video.singleMp4Url && <source src={video.singleMp4Url} type="video/mp4" />}
         </video>

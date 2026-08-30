@@ -56,7 +56,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: InfiniteFe
   // Triple the feed so the user can scroll in both directions indefinitely
   const tripleVideos = [...feedVideos, ...feedVideos, ...feedVideos];
 
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(() => N > 0 ? tripleVideos[N].id + `-${N}` : null);
   const [globalMuted, setGlobalMuted] = useState(true);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
