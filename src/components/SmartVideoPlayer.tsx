@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Volume2, VolumeX, ThumbsUp, ThumbsDown, MessageSquare, Share2, MoreHorizontal } from "lucide-react";
 import YouTube, { YouTubePlayer } from "react-youtube";
 
@@ -375,12 +375,11 @@ export default function SmartVideoPlayer({
     if (event.data === 2) setIsPlaying(false);
   };
 
-  const ytOptions = {
+  const ytOptions = useMemo(() => ({
     width: "100%",
     height: "100%",
     playerVars: {
       autoplay: 1,
-      mute: globalMuted ? 1 : 0,
       controls: 0,
       disablekb: 1,
       fs: 0,
@@ -392,7 +391,7 @@ export default function SmartVideoPlayer({
       loop: 1,
       playlist: video.youtubeId
     }
-  };
+  }), [video.youtubeId]);
 
   const showGroupClass = !idleHidden || isTrailerMode;
 
