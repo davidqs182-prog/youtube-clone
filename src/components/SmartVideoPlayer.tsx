@@ -428,15 +428,6 @@ export default function SmartVideoPlayer({
         </div>
       )}
 
-      {/* Header Overlay (Mute only) */}
-      <div className="absolute top-0 left-0 right-0 p-4 flex justify-end items-start pointer-events-none z-40">
-        <button 
-          onClick={toggleMute}
-          className="p-3 pointer-events-auto bg-black/40 hover:bg-black/60 rounded-full text-white backdrop-blur-md transition-all shadow-md"
-        >
-           {globalMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-        </button>
-      </div>
 
       {/* Controls Hover Overlay Container */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 pointer-events-none" />
