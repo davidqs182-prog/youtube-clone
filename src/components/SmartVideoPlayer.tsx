@@ -525,7 +525,7 @@ export default function SmartVideoPlayer({
       </div>
 
       {/* Right Side Interaction Bar (TikTok style) */}
-      <div className={`absolute top-1/2 -translate-y-1/2 right-3 md:right-5 flex flex-col items-center gap-5 z-20 pointer-events-auto transition-opacity duration-500 ${idleHidden && !isTrailerMode ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`absolute top-1/2 -translate-y-1/2 -mt-4 right-3 md:right-5 flex flex-col items-center gap-5 z-20 pointer-events-auto transition-opacity duration-500 ${idleHidden && !isTrailerMode ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
          {/* Profile Badge */}
          <div className="flex flex-col items-center gap-1 cursor-pointer hover:scale-105 transition-transform mb-2">
             <div className="relative">
