@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function CollectionCard({ video }: { video: any }) {
   const [isHovered, setIsHovered] = useState(false);
   const [inView, setInView] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const scrollContainer = cardRef.current?.closest('.overflow-y-auto') || null;
