@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
 // Collection Card with stacked visual effect and category badge
 export default function CollectionCard({ video }: { video: any }) {
@@ -37,9 +38,10 @@ export default function CollectionCard({ video }: { video: any }) {
   const gifSrc = video.gifUrl;
 
   return (
-    <div 
+    <Link 
+      href="/bachata-fuego"
       ref={cardRef}
-      className="relative w-full shrink-0 group cursor-pointer pt-3 mb-2"
+      className="relative w-full shrink-0 group cursor-pointer pt-3 mb-2 block"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -73,6 +75,6 @@ export default function CollectionCard({ video }: { video: any }) {
             <span className="text-white font-semibold text-sm drop-shadow-md">{categoryName}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

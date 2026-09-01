@@ -631,5 +631,357 @@
       "mp4Url": "/videos/trailers/yb_1wbiPz9g_h0.mp4",
       "gifUrl": "/videos/trailers/yb_1wbiPz9g_h0.gif"
     }
+  ],
+  "bachataVideos": [
+    {
+      "id": "bachata-1",
+      "youtubeId": "85USoqN6WZ8",
+      "url": "https://www.youtube.com/watch?v=85USoqN6WZ8",
+      "title": "ATACA & LA ALEMANA – Bachata Dance Performance – 40 MILLION VIEW PARTY",
+      "author": "Island Touch Channel",
+      "avatar": "https://i.pravatar.cc/150?u=IslandTouchChannel",
+      "views": "40M views",
+      "publishedAt": "Bachata Sensual",
+      "likes": "540K",
+      "comments": "12.3K",
+      "description": "La pareja icónica de Bachata Sensual muestra una interpretación apasionada llena de fluidez, caídas suaves y footwork dominicano.",
+      "thumbnail": "https://i.ytimg.com/vi/85USoqN6WZ8/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Footwork & Giros",
+          "mp4Url": "/videos/bachata_fuego/85USoqN6WZ8_h1.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Onda Sensual de Inicio",
+          "mp4Url": "/videos/bachata_fuego/85USoqN6WZ8_h0.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Caída Sensual Dip",
+          "mp4Url": "/videos/bachata_fuego/85USoqN6WZ8_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/85USoqN6WZ8_full.mp4"
+    },
+    {
+      "id": "bachata-2",
+      "youtubeId": "Ax7nEbsvjRY",
+      "url": "https://www.youtube.com/watch?v=Ax7nEbsvjRY",
+      "title": "Ataca x La Alemana – Brazilian Bachata Dance",
+      "author": "Island Touch Channel",
+      "avatar": "https://i.pravatar.cc/150?u=IslandTouchChannel",
+      "views": "8.5M views",
+      "publishedAt": "Bachata Sensual",
+      "likes": "180K",
+      "comments": "4.5K",
+      "description": "Fusión magistral de Bachata Sensual con aislamientos corporales y ritmo estilo brasileño.",
+      "thumbnail": "https://i.ytimg.com/vi/Ax7nEbsvjRY/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Fusión Brasileña Intro",
+          "mp4Url": "/videos/bachata_fuego/Ax7nEbsvjRY_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Aislamiento Corporal",
+          "mp4Url": "/videos/bachata_fuego/Ax7nEbsvjRY_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Clímax de Cierre",
+          "mp4Url": "/videos/bachata_fuego/Ax7nEbsvjRY_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/Ax7nEbsvjRY_full.mp4"
+    },
+    {
+      "id": "bachata-3",
+      "youtubeId": "VTjh1yRwAjg",
+      "url": "https://www.youtube.com/watch?v=VTjh1yRwAjg",
+      "title": "Micka & Bachatera - Bachata Social at World Stars Salsa Festival 2026",
+      "author": "World Stars Salsa Festival",
+      "avatar": "https://i.pravatar.cc/150?u=WorldStarsSalsaFestival",
+      "views": "1.2M views",
+      "publishedAt": "Social Dance",
+      "likes": "95K",
+      "comments": "1.8K",
+      "description": "Baile social electrizante grabado en vivo en el festival, destacando guías sutiles, giros rápidos y conexión en pareja.",
+      "thumbnail": "https://i.ytimg.com/vi/VTjh1yRwAjg/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Conexión de Guiado Sutil",
+          "mp4Url": "/videos/bachata_fuego/VTjh1yRwAjg_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Giros Rápidos & Footwork",
+          "mp4Url": "/videos/bachata_fuego/VTjh1yRwAjg_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Remate de Baile Social",
+          "mp4Url": "/videos/bachata_fuego/VTjh1yRwAjg_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/VTjh1yRwAjg_full.mp4"
+    },
+    {
+      "id": "bachata-4",
+      "youtubeId": "j4CmXKDCMzI",
+      "url": "https://www.youtube.com/watch?v=j4CmXKDCMzI",
+      "title": "Gero & Migle | Bachata | Para Besarte - Lean & Akai",
+      "author": "Gero y Miglė",
+      "avatar": "https://i.pravatar.cc/150?u=GeroyMigle",
+      "views": "2.8M views",
+      "publishedAt": "Sensual Bachata",
+      "likes": "145K",
+      "comments": "3.1K",
+      "description": "Coreografía emotiva con la canción 'Para Besarte', repleta de ondas de pecho fluidas y giros sincronizados.",
+      "thumbnail": "https://i.ytimg.com/vi/j4CmXKDCMzI/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Onda de Pecho Fluida",
+          "mp4Url": "/videos/bachata_fuego/j4CmXKDCMzI_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Giro Sincronizado Lento",
+          "mp4Url": "/videos/bachata_fuego/j4CmXKDCMzI_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Inclinación Sensual Final",
+          "mp4Url": "/videos/bachata_fuego/j4CmXKDCMzI_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/j4CmXKDCMzI_full.mp4"
+    },
+    {
+      "id": "bachata-5",
+      "youtubeId": "Wh1zERcDWGM",
+      "url": "https://www.youtube.com/watch?v=Wh1zERcDWGM",
+      "title": "Paolo & Alina - Homenaje a la Música Cubana [Salsa & Bachata]",
+      "author": "World Latin Congress",
+      "avatar": "https://i.pravatar.cc/150?u=WorldLatinCongress",
+      "views": "950K views",
+      "publishedAt": "Latin Performance",
+      "likes": "62K",
+      "comments": "1.1K",
+      "description": "Performance enérgica llena de sabor latino, musicalidad rica e inclinaciones expresivas.",
+      "thumbnail": "https://i.ytimg.com/vi/Wh1zERcDWGM/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Intro con Sabor Latino",
+          "mp4Url": "/videos/bachata_fuego/Wh1zERcDWGM_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Secuencia de Pasos Cubanos",
+          "mp4Url": "/videos/bachata_fuego/Wh1zERcDWGM_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Inclinación Final con Estilo",
+          "mp4Url": "/videos/bachata_fuego/Wh1zERcDWGM_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/Wh1zERcDWGM_full.mp4"
+    },
+    {
+      "id": "bachata-6",
+      "youtubeId": "FJqbePx-ihc",
+      "url": "https://www.youtube.com/watch?v=FJqbePx-ihc",
+      "title": "Micka & Bachatera - Bachata Social Demo",
+      "author": "World Stars Salsa Festival",
+      "avatar": "https://i.pravatar.cc/150?u=WorldStarsSalsaFestival",
+      "views": "1.5M views",
+      "publishedAt": "Social Demo",
+      "likes": "110K",
+      "comments": "2.4K",
+      "description": "Demostración de baile social con transiciones fluidas de cadera, contratiempos y cadencia moderna.",
+      "thumbnail": "https://i.ytimg.com/vi/FJqbePx-ihc/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Transición de Cadera Fluida",
+          "mp4Url": "/videos/bachata_fuego/FJqbePx-ihc_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Contratiempo & Footwork",
+          "mp4Url": "/videos/bachata_fuego/FJqbePx-ihc_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Cierre con Cadencia Moderna",
+          "mp4Url": "/videos/bachata_fuego/FJqbePx-ihc_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/FJqbePx-ihc_full.mp4"
+    },
+    {
+      "id": "bachata-7",
+      "youtubeId": "kK6nId6Mx1s",
+      "url": "https://www.youtube.com/watch?v=kK6nId6Mx1s",
+      "title": "Cristian & Gabriela - Bachata Workshop at World Stars Salsa Festival 2026",
+      "author": "World Stars Salsa Festival",
+      "avatar": "https://i.pravatar.cc/150?u=WorldStarsSalsaFestival",
+      "views": "1.1M views",
+      "publishedAt": "Workshop Demo",
+      "likes": "88K",
+      "comments": "1.5K",
+      "description": "Demostración técnica de taller de bachata enfocado en musicalidad, guía limpia y secuencias de pies.",
+      "thumbnail": "https://i.ytimg.com/vi/kK6nId6Mx1s/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Técnica de Guiado Limpio",
+          "mp4Url": "/videos/bachata_fuego/kK6nId6Mx1s_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Secuencia de Footwork Rápido",
+          "mp4Url": "/videos/bachata_fuego/kK6nId6Mx1s_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Cierre de Taller en Pareja",
+          "mp4Url": "/videos/bachata_fuego/kK6nId6Mx1s_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/kK6nId6Mx1s_full.mp4"
+    },
+    {
+      "id": "bachata-8",
+      "youtubeId": "uW7Ej4vv1Dk",
+      "url": "https://www.youtube.com/watch?v=uW7Ej4vv1Dk",
+      "title": "Ronald & Bachatera - Bachata Social at World Stars Salsa Festival 2026",
+      "author": "World Stars Salsa Festival",
+      "avatar": "https://i.pravatar.cc/150?u=WorldStarsSalsaFestival",
+      "views": "2.1M views",
+      "publishedAt": "Social Showcase",
+      "likes": "160K",
+      "comments": "3.8K",
+      "description": "Exhibición de baile social con ritmo caribeño auténtico, vueltas rápidas y remates expresivos.",
+      "thumbnail": "https://i.ytimg.com/vi/uW7Ej4vv1Dk/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Ritmo Caribeño Auténtico",
+          "mp4Url": "/videos/bachata_fuego/uW7Ej4vv1Dk_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Vueltas Rápidas Continuas",
+          "mp4Url": "/videos/bachata_fuego/uW7Ej4vv1Dk_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Remate Apasionado Final",
+          "mp4Url": "/videos/bachata_fuego/uW7Ej4vv1Dk_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/uW7Ej4vv1Dk_full.mp4"
+    },
+    {
+      "id": "bachata-9",
+      "youtubeId": "zUbW0GsRT1k",
+      "url": "https://www.youtube.com/watch?v=zUbW0GsRT1k",
+      "title": "This dance stopped traffic 😳 Matt Steffanina & Enola Bedard",
+      "author": "Matt Steffanina",
+      "avatar": "https://i.pravatar.cc/150?u=IslandTouchChannel",
+      "views": "15M views",
+      "publishedAt": "Bachata Classic",
+      "likes": "390K",
+      "comments": "8.9K",
+      "description": "Interpretación dinámica del tema 'Loco', combinando giros enérgicos con desaceleraciones sensualmente controladas.",
+      "thumbnail": "https://i.ytimg.com/vi/zUbW0GsRT1k/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 4.5,
+          "caption": "Paso Básico Loco",
+          "mp4Url": "/videos/bachata_fuego/zUbW0GsRT1k_h0.mp4"
+        },
+        {
+          "start": 4.5,
+          "end": 9,
+          "caption": "Sensual Dip en Pareja",
+          "mp4Url": "/videos/bachata_fuego/zUbW0GsRT1k_h1.mp4"
+        },
+        {
+          "start": 9,
+          "end": 13.5,
+          "caption": "Giro Rápido & Parada",
+          "mp4Url": "/videos/bachata_fuego/zUbW0GsRT1k_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/zUbW0GsRT1k_full.mp4"
+    },
+    {
+      "id": "bachata-10",
+      "youtubeId": "K-0v3TgOG9E",
+      "url": "https://www.youtube.com/watch?v=K-0v3TgOG9E",
+      "title": "Bailando BACHATA DOMINICANA en la calle💎 🥰2020 | Rodolfo y Franchelle | baile d República Dominicana",
+      "author": "Rodolfo y Franchelle",
+      "avatar": "https://i.pravatar.cc/150?u=IslandTouchChannel",
+      "views": "12.4M views",
+      "publishedAt": "Bachata Festival",
+      "likes": "310K",
+      "comments": "6.7K",
+      "description": "Showcase espectacular en vivo con combinaciones de giro de alta complejidad y estética refinada.",
+      "thumbnail": "https://i.ytimg.com/vi/K-0v3TgOG9E/hqdefault.jpg",
+      "highlights": [
+        {
+          "start": 0,
+          "end": 8,
+          "caption": "Entrada de Showcase en Vivo",
+          "mp4Url": "/videos/bachata_fuego/K-0v3TgOG9E_h0.mp4"
+        },
+        {
+          "start": 8,
+          "end": 16,
+          "caption": "Combinaciones de Giro Complejas",
+          "mp4Url": "/videos/bachata_fuego/K-0v3TgOG9E_h1.mp4"
+        },
+        {
+          "start": 16,
+          "end": 24,
+          "caption": "Gran Cierre Apasionado",
+          "mp4Url": "/videos/bachata_fuego/K-0v3TgOG9E_h2.mp4"
+        }
+      ],
+      "singleMp4Url": "/videos/bachata_fuego/K-0v3TgOG9E_full.mp4"
+    }
   ]
 }

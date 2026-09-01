@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import SmartVideoPlayer from "./SmartVideoPlayer";
 import SuggestedVideoCard from "./SuggestedVideoCard";
 import CollectionCard from "./CollectionCard";
@@ -49,9 +51,11 @@ interface SuggestedVideo {
 interface InfiniteFeedProps {
   feedVideos: VideoData[];
   suggestedVideos: SuggestedVideo[];
+  title?: string;
+  showBackButton?: boolean;
 }
 
-export default function InfiniteFeed({ feedVideos, suggestedVideos }: InfiniteFeedProps) {
+export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showBackButton }: InfiniteFeedProps) {
   const N = feedVideos.length;
   // Triple the feed so the user can scroll in both directions indefinitely
   const tripleVideos = [...feedVideos, ...feedVideos, ...feedVideos];
@@ -279,6 +283,27 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos }: InfiniteFe
       
       {/* Left Column: Main Playback Video Feed (Spans 9 Columns of 12) */}
       <div className={`${isFullscreen && !isCommentsOpen ? 'w-full flex flex-col gap-0' : 'col-span-12 xl:col-span-9 w-full flex flex-col gap-10 md:gap-16'}`}>
+        
+        {/* Collection Header (Fixed/Sticky circular button + title, moved 4px up) */}
+        {(showBackButton || title) && (
+          <div className="sticky top-1 z-40 flex items-center gap-3 mb-1 -mt-1 shrink-0 py-0.5">
+            {showBackButton && (
+              <Link 
+                href="/" 
+                className="w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all flex items-center justify-center border border-white/15 shadow-xl active:scale-95 shrink-0"
+                title="Volver a Home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+            )}
+            {title && (
+              <h1 className="text-lg font-bold text-white tracking-wide flex items-center gap-2 drop-shadow-lg bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                {title}
+              </h1>
+            )}
+          </div>
+        )}
+
         {tripleVideos.map((video, idx) => {
           const compositeId = `${video.id}-${idx}`;
           const isActive = activeVideoId === compositeId;
