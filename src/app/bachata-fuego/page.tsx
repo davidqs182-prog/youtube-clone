@@ -1,20 +1,15 @@
-import fs from "fs";
-import path from "path";
+import videosData from "@/data/videos.json";
 import InfiniteFeed from "@/components/InfiniteFeed";
 
-// Server Component: fetching Bachata Fuego collection data
-export default async function BachataFuegoPage() {
-  const filePath = path.join(process.cwd(), "src/data/videos.json");
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const data = JSON.parse(fileContent);
-
-  const feedVideos = data.bachataVideos || data.feedVideos;
+// Server Component: using static imported video data for 100% Vercel Serverless compatibility
+export default function BachataFuegoPage() {
+  const feedVideos = (videosData as any).bachataVideos || (videosData as any).feedVideos;
 
   return (
     <div className="w-full min-h-full bg-[var(--yt-bg)] text-[var(--yt-text)] pattern-bg">
       <InfiniteFeed 
         feedVideos={feedVideos} 
-        suggestedVideos={data.suggestedVideos} 
+        suggestedVideos={(videosData as any).suggestedVideos} 
         title="Bachata Fuego 🔥"
         showBackButton={true}
       />

@@ -1,16 +1,14 @@
-import fs from "fs";
-import path from "path";
+import videosData from "@/data/videos.json";
 import InfiniteFeed from "@/components/InfiniteFeed";
 
-// Server Component: fetching local mock API data
-export default async function Home() {
-  const filePath = path.join(process.cwd(), "src/data/videos.json");
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const data = JSON.parse(fileContent);
-
+// Server Component: using static imported video data for 100% Vercel Serverless compatibility
+export default function Home() {
   return (
     <div className="w-full min-h-full bg-[var(--yt-bg)] text-[var(--yt-text)] pattern-bg">
-      <InfiniteFeed feedVideos={data.feedVideos} suggestedVideos={data.suggestedVideos} />
+      <InfiniteFeed 
+        feedVideos={(videosData as any).feedVideos} 
+        suggestedVideos={(videosData as any).suggestedVideos} 
+      />
     </div>
   );
 }
