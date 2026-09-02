@@ -70,6 +70,16 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
   const isScrollingRef = useRef<boolean>(false);
   const touchStartRef = useRef<number>(0);
   const isJumpingRef = useRef<boolean>(false);
+  const isExpandingRef = useRef<boolean>(false);
+
+  // Freeze IntersectionObserver during layout transition (fullscreen/comments)
+  useEffect(() => {
+    isExpandingRef.current = true;
+    const timer = setTimeout(() => {
+      isExpandingRef.current = false;
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [isFullscreen, isCommentsOpen]);
 
   // On first render, jump to the start of the middle block (index N) instantly
   useEffect(() => {
@@ -92,6 +102,16 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
     return () => document.removeEventListener("fullscreenchange", handleFs);
   }, []);
 
+  // When exiting fullscreen layout, ensure current active video is centered in view
+  useEffect(() => {
+    if (!isFullscreen) {
+      const activeEl = videoRefs.current[currentIndex.current];
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "center" });
+      }
+    }
+  }, [isFullscreen]);
+
   // IntersectionObserver finding the most visible card in viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -106,7 +126,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
           }
         });
 
-        if (bestEntry && maxRatio >= 0.35 && !isJumpingRef.current) {
+        if (bestEntry && maxRatio >= 0.35 && !isJumpingRef.current && !isExpandingRef.current) {
           const rawId = (bestEntry as IntersectionObserverEntry).target.getAttribute("data-id");
           const idxAttr = (bestEntry as IntersectionObserverEntry).target.getAttribute("data-index");
           const idx = idxAttr !== null ? parseInt(idxAttr, 10) : -1;

@@ -76,14 +76,18 @@ export default function SmartVideoPlayer({
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [idleHidden, setIdleHidden] = useState(false);
 
-  // Reset states whenever video changes or becomes inactive
+  // Reset states when video changes or when transitioning from active to inactive
+  const prevActiveRef = useRef(isActive);
   useEffect(() => {
-    isPlayerReadyRef.current = false;
-    setYtPlayer(null);
-    setIsTrailerMode(true);
-    setCurrentHighlightIndex(0);
-    setHighlightProgress(0);
-    hasEndedRef.current = false;
+    if (!isActive && prevActiveRef.current) {
+      isPlayerReadyRef.current = false;
+      setYtPlayer(null);
+      setIsTrailerMode(true);
+      setCurrentHighlightIndex(0);
+      setHighlightProgress(0);
+      hasEndedRef.current = false;
+    }
+    prevActiveRef.current = isActive;
   }, [video.youtubeId, isActive]);
 
   useEffect(() => {
