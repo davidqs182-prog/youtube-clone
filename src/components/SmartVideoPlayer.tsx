@@ -57,6 +57,8 @@ export default function SmartVideoPlayer({
   
   // Trailer mode vs Full YouTube Playback mode
   const [isTrailerMode, setIsTrailerMode] = useState(true);
+  const [isYtActive, setIsYtActive] = useState(false);
+  const [isYtBuffering, setIsYtBuffering] = useState(false);
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
   const [highlightProgress, setHighlightProgress] = useState(0);
   const [trailerLoopCount, setTrailerLoopCount] = useState(0);
@@ -83,6 +85,8 @@ export default function SmartVideoPlayer({
       isPlayerReadyRef.current = false;
       setYtPlayer(null);
       setIsTrailerMode(true);
+      setIsYtActive(false);
+      setIsYtBuffering(false);
       setCurrentHighlightIndex(0);
       setHighlightProgress(0);
       hasEndedRef.current = false;
@@ -267,9 +271,10 @@ export default function SmartVideoPlayer({
   const togglePlay = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     
-    // When clicking card during trailer mode -> Switch to Full YouTube Mode
+    // When clicking card during trailer mode -> Initiate Seamless YouTube Crossfade
     if (isTrailerMode) {
-      setIsTrailerMode(false);
+      setIsYtActive(true);
+      setIsYtBuffering(true);
       setIsPlaying(true);
       if (video.youtubeId && ytPlayer) {
         callYt('seekTo', 0, true);
@@ -325,7 +330,10 @@ export default function SmartVideoPlayer({
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (isTrailerMode) setIsTrailerMode(false);
+    if (isTrailerMode) {
+      setIsYtActive(true);
+      setIsYtBuffering(true);
+    }
     isDraggingRef.current = true;
     updateScrubberFromEvent(e);
     
@@ -369,13 +377,21 @@ export default function SmartVideoPlayer({
     isPlayerReadyRef.current = true;
     setYtPlayer(event.target);
     forceApplyMute(globalMuted, event.target);
-    if (!isTrailerMode) {
+    if (isYtActive || !isTrailerMode) {
       event.target.playVideo();
     }
   };
 
   const onYtStateChange = (event: any) => {
-    if (event.data === 1) setIsPlaying(true);
+    if (event.data === 1) { // PLAYING
+      setIsPlaying(true);
+      setIsYtBuffering(false);
+      if (isTrailerMode) {
+        setTimeout(() => {
+          setIsTrailerMode(false);
+        }, 450);
+      }
+    }
     if (event.data === 2) setIsPlaying(false);
     if (event.data === 0) {
       setIsPlaying(false);
@@ -418,8 +434,8 @@ export default function SmartVideoPlayer({
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
 
-      {/* 1. Single HTML5 MP4 Video Trailer Highlight Mode (version 3 .mp4) */}
-      {isTrailerMode && isActive && (
+      {/* 1. Single HTML5 MP4 Video Trailer Highlight Mode */}
+      {(isTrailerMode || isYtBuffering) && isActive && (
         <video
           ref={videoRef}
           autoPlay
@@ -433,23 +449,30 @@ export default function SmartVideoPlayer({
           onTimeUpdate={handleTrailerTimeUpdate}
           onEnded={handleTrailerEnded}
           onError={handleTrailerEnded}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 transform-gpu will-change-transform"
+          className={`absolute inset-0 w-full h-full object-cover pointer-events-none z-10 transform-gpu will-change-transform transition-opacity duration-500 ${!isTrailerMode && !isYtBuffering ? 'opacity-0' : 'opacity-100'}`}
         >
           {video.singleMp4Url && <source src={video.singleMp4Url} type="video/mp4" />}
         </video>
       )}
 
-      {/* 2. Full YouTube Playback Mode (Renders at z-20 when user clicks card to play full video) */}
-      {!isTrailerMode && video.youtubeId && isActive && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+      {/* 2. Full YouTube Playback Mode Layer */}
+      {(isYtActive || !isTrailerMode) && video.youtubeId && isActive && (
+        <div className={`absolute inset-0 pointer-events-none overflow-hidden z-20 transition-opacity duration-500 ${isTrailerMode && isYtBuffering ? 'opacity-0' : 'opacity-100'}`}>
            <YouTube 
              videoId={video.youtubeId} 
              opts={ytOptions} 
              onReady={onYtReady} 
              onStateChange={onYtStateChange}
              onError={() => setVideoError(true)}
-             className="w-[100%] h-[100%] scale-[1.35] transition-opacity duration-300 pointer-events-none [&>iframe]:pointer-events-none [&>iframe]:w-full [&>iframe]:h-full" 
+             className="w-[100%] h-[100%] scale-[1.35] pointer-events-none [&>iframe]:pointer-events-none [&>iframe]:w-full [&>iframe]:h-full" 
            />
+        </div>
+      )}
+
+      {/* 3. Sleek YouTube Loading Ring Indicator */}
+      {isYtBuffering && (
+        <div className="absolute inset-0 z-25 flex items-center justify-center pointer-events-none">
+          <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin shadow-md" />
         </div>
       )}
 
