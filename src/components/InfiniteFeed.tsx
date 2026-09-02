@@ -292,9 +292,18 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
   }, []);
 
   const handleTrailerEnd = (tripleIdx: number) => {
-    const nextRef = videoRefs.current[tripleIdx + 1];
-    if (nextRef) {
-      nextRef.scrollIntoView({ behavior: "smooth", block: "center" });
+    const nextIdx = tripleIdx + 1;
+    if (nextIdx < tripleVideos.length) {
+      const nextCompositeId = `${tripleVideos[nextIdx].id}-${nextIdx}`;
+      setActiveVideoId(nextCompositeId);
+      currentIndex.current = nextIdx;
+
+      const nextRef = videoRefs.current[nextIdx];
+      if (nextRef) {
+        nextRef.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      performSilentJumpIfNeeded(nextIdx);
     }
   };
 

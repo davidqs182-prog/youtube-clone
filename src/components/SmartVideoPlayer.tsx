@@ -377,6 +377,10 @@ export default function SmartVideoPlayer({
   const onYtStateChange = (event: any) => {
     if (event.data === 1) setIsPlaying(true);
     if (event.data === 2) setIsPlaying(false);
+    if (event.data === 0) {
+      setIsPlaying(false);
+      onTrailerEnd();
+    }
   };
 
   const ytOptions = useMemo(() => ({
