@@ -313,8 +313,8 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
       {/* Left Column: Main Playback Video Feed (Spans 9 Columns of 12) */}
       <div className={`${isFullscreen && !isCommentsOpen ? 'w-full flex flex-col gap-0' : 'col-span-12 xl:col-span-9 w-full flex flex-col gap-10 md:gap-16'}`}>
         
-        {/* Collection Header (Fixed/Sticky circular button + title, moved 4px up) */}
-        {(showBackButton || title) && (
+        {/* Collection Header (Fixed/Sticky circular button + title, hidden in expanded mode) */}
+        {(showBackButton || title) && (!isFullscreen || isCommentsOpen) && (
           <div className="sticky top-1 z-40 flex items-center gap-3 mb-1 -mt-1 shrink-0 py-0.5">
             {showBackButton && (
               <Link 
