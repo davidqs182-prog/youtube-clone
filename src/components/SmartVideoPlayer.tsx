@@ -458,7 +458,7 @@ export default function SmartVideoPlayer({
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 pointer-events-none" />
 
       {/* Title and Description */}
-      <div className={`absolute left-0 right-16 px-6 pt-6 pb-0 flex flex-col justify-end pointer-events-none z-20 transition-all duration-200 bottom-[24px] group-hover:bottom-[76px] ${isTrailerMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+      <div className={`absolute left-0 right-16 px-6 pt-6 pb-0 flex flex-col justify-end pointer-events-none z-20 transition-all duration-200 ${isTrailerMode ? 'bottom-[24px] group-hover:bottom-[76px] opacity-100' : 'bottom-[24px] group-hover:bottom-[96px] opacity-0 group-hover:opacity-100'}`}>
         <h2 
           className="text-white font-bold drop-shadow-lg line-clamp-2" 
           style={{ fontSize: "20px", lineHeight: "28px" }}
