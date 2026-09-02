@@ -450,8 +450,11 @@ export default function SmartVideoPlayer({
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 pointer-events-none" />
 
       {/* Title and Description */}
-      <div className={`absolute left-0 right-16 px-6 pt-6 pb-0 flex flex-col justify-end pointer-events-none z-20 transition-all duration-200 bottom-[24px] group-hover:bottom-[92px] ${isTrailerMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        <h2 className="text-white text-xl md:text-2xl font-bold leading-tight drop-shadow-lg line-clamp-2">
+      <div className={`absolute left-0 right-16 px-6 pt-6 pb-0 flex flex-col justify-end pointer-events-none z-20 transition-all duration-200 bottom-[24px] group-hover:bottom-[76px] ${isTrailerMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+        <h2 
+          className="text-white font-bold drop-shadow-lg line-clamp-2" 
+          style={{ fontSize: "20px", lineHeight: "28px" }}
+        >
            {video.title}
         </h2>
         <p className="text-gray-300 text-sm mt-2 line-clamp-2 drop-shadow-md">
@@ -490,30 +493,65 @@ export default function SmartVideoPlayer({
         {/* Control Buttons */}
         <div className="flex items-center justify-between">
            <div className="flex items-center gap-2">
-             <div className="p-[4px] bg-black/50 backdrop-blur-md rounded-full text-white">
-               <button onClick={togglePlay} className="p-[4px] hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+             <div className="p-[4px] bg-black/50 backdrop-blur-md rounded-full text-white flex items-center">
+               <button 
+                 onClick={togglePlay} 
+                 className="pl-[6px] pr-4 py-[6px] hover:bg-white/20 rounded-full flex items-center justify-center gap-2 transition-colors cursor-pointer"
+               >
                  {isPlaying ? 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
+                   <svg height="24" width="24" version="1.1" viewBox="0 0 36 36" className="fill-current"><path d="M 12,26 16,26 16,10 12,10 z M 21,26 25,26 25,10 21,10 z"></path></svg> : 
+                   <svg height="24" width="24" version="1.1" viewBox="0 0 36 36" className="fill-current"><path d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path></svg>
                  }
+                 <span 
+                   className="text-white font-medium select-none" 
+                   style={{fontFamily: "Roboto, Arial, sans-serif", fontSize: "14px"}}
+                 >
+                   Full Video
+                 </span>
                </button>
              </div>
              <div className="p-[4px] bg-black/50 backdrop-blur-md rounded-full text-white">
-               <button onClick={toggleMute} className="p-[4px] hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+               <button onClick={toggleMute} className="p-[6px] hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
                  {globalMuted ? 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
-                   <svg height="36" version="1.1" viewBox="0 0 36 36" width="36" className="fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
+                   <svg height="24" width="24" version="1.1" viewBox="0 0 36 36" className="fill-current"><path d="m 21.48,17.98 c 0,-1.77 -1.02,-3.29 -2.5,-4.03 v 2.21 l 2.45,2.45 c .05,-0.2 .05,-0.4 .05,-0.63 z m 2.5,0 c 0,.94 -0.2,1.82 -0.54,2.64 l 1.51,1.51 c .66,-1.14 1.03,-2.46 1.03,-3.86 0,-4.28 -2.99,-7.86 -7,-8.76 v 2.05 c 2.89,.86 5,3.54 5,5.42 z M 9.25,8.98 l -1.27,1.26 4.72,4.73 H 7.98 v 6 h 4 l 5,5 v -6.73 l 4.25,4.25 c -0.67,.52 -1.42,.93 -2.25,1.18 v 2.06 c 1.38,-0.31 2.63,-0.95 3.69,-1.81 l 2.49,2.51 1.27,-1.27 -17.18,-17.18 z m 8.73,1.64 v 3.09 L 14.16,9.89 l 3.82,-3.52 z"></path></svg> : 
+                   <svg height="24" width="24" version="1.1" viewBox="0 0 36 36" className="fill-current"><path d="M8,21 L12,21 L17,26 L17,10 L12,15 L8,15 L8,21 Z M19,14 L19,22 C20.48,21.53 21.5,20.08 21.5,18 C21.5,15.92 20.48,14.47 19,14 Z"></path></svg>
                  }
                </button>
              </div>
-             <div className="px-4 py-[16px] bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
+             <div className="px-4 py-[10px] bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white font-medium tracking-wide">
                 <span ref={timeTextRef} style={{fontFamily: "Roboto, Arial, sans-serif", fontSize: "14px"}}>0:00 / 0:00</span>
              </div>
            </div>
 
-           <div className="flex items-center bg-black/50 backdrop-blur-md rounded-full p-[4px] text-white mr-0">
-             <div onClick={toggleFullscreen} className="p-[4px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center">
-               <svg width="36" height="36" viewBox="-2 -2 28 28" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+           <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md rounded-full p-[4px] text-white mr-0">
+             {/* Subtitles / Captions Button */}
+             <div 
+               className="p-[6px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center"
+               title="Subtítulos"
+             >
+               <svg width="24" height="24" viewBox="0 0 36 36" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                 <rect x="6" y="9" width="24" height="18" rx="4" strokeWidth="2.3" />
+                 <line x1="11" y1="15" x2="16" y2="15" />
+                 <line x1="19" y1="15" x2="25" y2="15" />
+                 <line x1="11" y1="21" x2="20" y2="21" />
+                 <line x1="23" y1="21" x2="25" y2="21" />
+               </svg>
+             </div>
+
+             {/* Settings Gear Button */}
+             <div 
+               className="p-[6px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center"
+               title="Configuración"
+             >
+               <svg width="24" height="24" viewBox="-2 -2 28 28" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                 <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                 <circle cx="12" cy="12" r="3"/>
+               </svg>
+             </div>
+
+             {/* Expand Fullscreen Button */}
+             <div onClick={toggleFullscreen} className="p-[6px] cursor-pointer hover:bg-white/20 rounded-full transition-colors flex items-center justify-center" title="Pantalla completa">
+               <svg width="24" height="24" viewBox="-2 -2 28 28" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                  <polyline points="9 5 5 5 5 9" />
                  <line x1="5" y1="5" x2="11" y2="11" />
                  <polyline points="15 19 19 19 19 15" />
