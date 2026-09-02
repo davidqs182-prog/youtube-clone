@@ -22,63 +22,35 @@ export default function GridOverlay() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  if (!showGrid) return null;
+
   return (
-    <>
-      {/* Small Clickable Dev Toggle Button (Visible when grid is off) */}
-      {!showGrid && (
-        <button
-          onClick={() => setShowGrid(true)}
-          className="fixed bottom-4 right-4 z-[9999] bg-black/80 hover:bg-black border border-cyan-500/50 text-cyan-400 hover:text-white text-xs font-mono px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md transition-all flex items-center gap-1.5 cursor-pointer pointer-events-auto"
-          title="Activar Grid (Ctrl + G)"
-        >
-          <span>📐</span>
-          <span>Grid (Ctrl+G)</span>
-        </button>
-      )}
-
-      {/* Grid Overlay Screen - Full 100% Width & 100% Height Without Sidebar Offset */}
-      {showGrid && (
-        <div className="fixed inset-0 pointer-events-none z-[9999] w-screen h-screen select-none overflow-hidden px-4 xl:px-6">
-          {/* 12-Column Responsive Full-Width Grid (Edge-to-Edge) */}
-          <div className="w-full h-full grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 xl:grid-cols-12 gap-4 xl:gap-6">
-            {Array.from({ length: 12 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="h-full bg-cyan-500/10 border-x border-cyan-500/30 flex flex-col justify-between p-1"
-              >
-                <span className="text-[9px] font-mono text-cyan-300 font-bold bg-black/80 px-1 py-0.5 rounded text-center self-center mt-3">
-                  C{idx + 1}
-                </span>
-                <span className="text-[9px] font-mono text-cyan-300 font-bold bg-black/80 px-1 py-0.5 rounded text-center self-center mb-16">
-                  C{idx + 1}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Horizontal 16px Baseline Grid Pattern Overlay */}
+    <div className="fixed inset-0 pointer-events-none z-[9999] w-screen h-screen select-none overflow-hidden px-4 xl:px-6">
+      {/* 12-Column Responsive Full-Width Grid (Edge-to-Edge) */}
+      <div className="w-full h-full grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 xl:grid-cols-12 gap-4 xl:gap-6">
+        {Array.from({ length: 12 }).map((_, idx) => (
           <div
-            className="absolute inset-0 pointer-events-none opacity-20"
-            style={{
-              backgroundImage: "linear-gradient(to bottom, rgba(244, 63, 94, 0.2) 1px, transparent 1px)",
-              backgroundSize: "100% 16px"
-            }}
-          />
-
-          {/* Floating Status Badge */}
-          <div className="fixed bottom-4 right-4 bg-black/95 border border-cyan-500/60 text-cyan-300 text-xs font-mono px-3.5 py-2 rounded-full shadow-2xl backdrop-blur-md flex items-center gap-2.5 pointer-events-auto z-[10000]">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span>Grid Total 12-Cols (Pantalla Completa)</span>
-            <button
-              onClick={() => setShowGrid(false)}
-              className="ml-1 text-gray-400 hover:text-white font-bold text-sm leading-none cursor-pointer"
-              title="Cerrar Grid"
-            >
-              ✕
-            </button>
+            key={idx}
+            className="h-full bg-cyan-500/10 border-x border-cyan-500/30 flex flex-col justify-between p-1"
+          >
+            <span className="text-[9px] font-mono text-cyan-300 font-bold bg-black/80 px-1 py-0.5 rounded text-center self-center mt-3">
+              C{idx + 1}
+            </span>
+            <span className="text-[9px] font-mono text-cyan-300 font-bold bg-black/80 px-1 py-0.5 rounded text-center self-center mb-16">
+              C{idx + 1}
+            </span>
           </div>
-        </div>
-      )}
-    </>
+        ))}
+      </div>
+
+      {/* Horizontal 16px Baseline Grid Pattern Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-20"
+        style={{
+          backgroundImage: "linear-gradient(to bottom, rgba(244, 63, 94, 0.2) 1px, transparent 1px)",
+          backgroundSize: "100% 16px"
+        }}
+      />
+    </div>
   );
 }
