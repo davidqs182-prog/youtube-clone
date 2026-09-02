@@ -327,6 +327,20 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
         {tripleVideos.map((video, idx) => {
           const compositeId = `${video.id}-${idx}`;
           const isActive = activeVideoId === compositeId;
+
+          // In fullscreen mode without comments, hide non-active cards to eliminate thumbnail flash
+          if (isFullscreen && !isCommentsOpen && !isActive) {
+            return (
+              <div 
+                key={compositeId}
+                data-id={compositeId}
+                data-index={idx}
+                ref={(el) => { videoRefs.current[idx] = el; }}
+                className="hidden"
+              />
+            );
+          }
+
           return (
             <div 
               key={compositeId}
