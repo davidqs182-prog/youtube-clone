@@ -3,6 +3,8 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import AppLayout from "@/components/AppLayout";
 import YtErrorSuppressor from "@/components/YtErrorSuppressor";
+import { CursorProvider } from "@/context/CursorContext";
+import CustomCursor from "@/components/CustomCursor";
 
 const roboto = Roboto({
   weight: ['400', '500', '700'],
@@ -24,10 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${roboto.variable} dark antialiased`} style={{ colorScheme: 'dark' }} suppressHydrationWarning>
       <body suppressHydrationWarning className="bg-[#0f0f0f] text-[#f1f1f1] overflow-hidden">
-        <YtErrorSuppressor />
-        <AppLayout>{children}</AppLayout>
+        <CursorProvider>
+          <YtErrorSuppressor />
+          <CustomCursor />
+          <AppLayout>{children}</AppLayout>
+        </CursorProvider>
       </body>
     </html>
   );
 }
+
 

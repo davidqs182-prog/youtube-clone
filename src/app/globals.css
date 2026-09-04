@@ -19,6 +19,13 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Hide native cursor on devices with mouse pointer */
+@media (hover: hover) and (pointer: fine) {
+  body, body *, a, button, [role="button"], input, select, textarea {
+    cursor: none !important;
+  }
+}
+
 /* Hide scrollbar for a cleaner look in the sidebar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
