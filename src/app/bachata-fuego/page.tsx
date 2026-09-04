@@ -9,7 +9,7 @@ export default function BachataFuegoPage() {
     <div className="w-full min-h-full bg-[var(--yt-bg)] text-[var(--yt-text)] pattern-bg">
       <InfiniteFeed 
         feedVideos={feedVideos} 
-        suggestedVideos={(videosData as any).suggestedVideos} 
+        suggestedVideos={(videosData as any).bachataSuggestedVideos || (videosData as any).suggestedVideos} 
         title="Bachata Fuego 🔥"
         showBackButton={true}
       />
