@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import ReactDOM from "react-dom";
 import { useCursor } from "@/context/CursorContext";
 
 export default function CustomCursor() {
@@ -8,6 +9,7 @@ export default function CustomCursor() {
   const [isTouchDevice, setIsTouchDevice] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [mountContainer, setMountContainer] = useState<HTMLElement | null>(null);
 
   // Target mouse position
   const mousePos = useRef({ x: -100, y: -100 });
@@ -24,6 +26,18 @@ export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const animFrameId = useRef<number | null>(null);
+
+  // Listen for Fullscreen API changes & dynamically set portal target container
+  useEffect(() => {
+    setMountContainer((document.fullscreenElement as HTMLElement) || document.body);
+
+    const handleFsChange = () => {
+      setMountContainer((document.fullscreenElement as HTMLElement) || document.body);
+    };
+
+    document.addEventListener("fullscreenchange", handleFsChange);
+    return () => document.removeEventListener("fullscreenchange", handleFsChange);
+  }, []);
 
   useEffect(() => {
     // Detect fine pointer (mouse vs touch)
@@ -134,20 +148,20 @@ export default function CustomCursor() {
     };
   }, [isVisible, isHovered, isMouseDown]);
 
-  if (isTouchDevice || !isVisible) return null;
+  if (isTouchDevice || !isVisible || !mountContainer) return null;
 
-  return (
+  const cursorContent = (
     <>
-      {/* Central circle (~32px / w-8 h-8) - 100% pure solid white, expands on click */}
+      {/* Central circle (~32px / w-8 h-8) - 100% pure solid white, z-[9999] */}
       <div
         ref={dotRef}
-        className={`fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-50 bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)] transition-transform duration-100 ease-out`}
+        className={`fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9999] bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)] transition-transform duration-100 ease-out`}
       />
 
-      {/* Large trailing outer circle (~96px / w-24 h-24) - gets much more opaque on click */}
+      {/* Large trailing outer circle (~96px / w-24 h-24) - z-[9998] */}
       <div
         ref={ringRef}
-        className={`fixed top-0 left-0 w-24 h-24 rounded-full pointer-events-none z-40 mix-blend-difference transition-all duration-300 ease-out flex items-center justify-center text-center ${
+        className={`fixed top-0 left-0 w-24 h-24 rounded-full pointer-events-none z-[9998] mix-blend-difference transition-all duration-300 ease-out flex items-center justify-center text-center ${
           isMouseDown
             ? "opacity-90 border-2 border-white bg-white/40 shadow-[0_0_20px_rgba(255,255,255,0.6)]"
             : "opacity-40 border border-white/50 bg-white/20"
@@ -161,4 +175,6 @@ export default function CustomCursor() {
       </div>
     </>
   );
+
+  return ReactDOM.createPortal(cursorContent, mountContainer);
 }
