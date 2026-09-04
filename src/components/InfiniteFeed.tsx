@@ -64,6 +64,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
   const [globalMuted, setGlobalMuted] = useState(true);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFeedReady, setIsFeedReady] = useState(false);
 
   const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
   const currentIndex = useRef<number>(N);
@@ -90,6 +91,10 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
       currentIndex.current = N;
       setActiveVideoId(tripleVideos[N].id + `-${N}`);
     }
+    const timer = requestAnimationFrame(() => {
+      setIsFeedReady(true);
+    });
+    return () => cancelAnimationFrame(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [N]);
 
@@ -114,6 +119,8 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
 
   // IntersectionObserver finding the most visible card in viewport
   useEffect(() => {
+    if (!isFeedReady) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         let bestEntry: IntersectionObserverEntry | null = null;
@@ -146,7 +153,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
 
     return () => observer.disconnect();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feedVideos]);
+  }, [feedVideos, isFeedReady]);
 
   // Silent infinite looping scroll jump
   const performSilentJumpIfNeeded = (index: number) => {
@@ -308,7 +315,7 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
   };
 
   return (
-    <div className={`w-full ${isFullscreen && !isCommentsOpen ? 'flex flex-col p-0 gap-0' : 'grid grid-cols-12 px-4 xl:px-6 py-6 gap-4 xl:gap-6 pb-32'}`}>
+    <div className={`w-full transition-opacity duration-150 ${isFeedReady ? 'opacity-100' : 'opacity-0'} ${isFullscreen && !isCommentsOpen ? 'flex flex-col p-0 gap-0' : 'grid grid-cols-12 px-4 xl:px-6 py-6 gap-4 xl:gap-6 pb-32'}`}>
       
       {/* Left Column: Main Playback Video Feed (Spans 9 Columns of 12) */}
       <div className={`${isFullscreen && !isCommentsOpen ? 'w-full flex flex-col gap-0' : 'col-span-12 xl:col-span-9 w-full flex flex-col gap-10 md:gap-16'}`}>
@@ -337,8 +344,8 @@ export default function InfiniteFeed({ feedVideos, suggestedVideos, title, showB
           const compositeId = `${video.id}-${idx}`;
           const isActive = activeVideoId === compositeId;
 
-          // In fullscreen mode without comments, hide non-active cards to eliminate thumbnail flash
-          if (isFullscreen && !isCommentsOpen && !isActive) {
+          // Hide non-active cards until initial layout scroll is centered or in fullscreen mode
+          if ((!isFeedReady || (isFullscreen && !isCommentsOpen)) && !isActive) {
             return (
               <div 
                 key={compositeId}
