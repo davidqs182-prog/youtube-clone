@@ -469,10 +469,15 @@ export default function SmartVideoPlayer({
         </div>
       )}
 
-      {/* 3. Sleek YouTube Loading Ring Indicator */}
+      {/* 3. High-Visibility YouTube Loading Spinner Ring Indicator */}
       {isYtBuffering && (
-        <div className="absolute inset-0 z-25 flex items-center justify-center pointer-events-none">
-          <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin shadow-md" />
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none animate-in fade-in duration-200 gap-3">
+          <div className="w-20 h-20 rounded-full bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center">
+            <div className="w-12 h-12 border-[3.5px] border-white/20 border-t-white rounded-full animate-spin" />
+          </div>
+          <span className="text-white text-xs font-semibold tracking-wide bg-black/75 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-2xl">
+            Loading full video...
+          </span>
         </div>
       )}
 
